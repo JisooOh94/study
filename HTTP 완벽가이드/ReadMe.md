@@ -2,7 +2,7 @@
 * HTTP 완벽가이드 책을 읽고 학습한 내용을 정리하는 repo입니다.
 
 ### 목차
-[1. 웹 서버 개요]()
+[1. 웹 서버 개요][https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/1.%20%EC%9B%B9%EC%84%9C%EB%B2%84%20%EA%B0%9C%EC%9A%94.md](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/1.%20%EC%9B%B9%EC%84%9C%EB%B2%84%20%EA%B0%9C%EC%9A%94.md)
 
 [2. URL]()
 
@@ -28,6 +28,6 @@
 
 [10. 사용자 식별]()
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEwMjgyNTY3MDIsLTEwMDY2ODQ2OTldfQ
-==
+eyJoaXN0b3J5IjpbMTA4MTY3ODg4MiwtMTAyODI1NjcwMiwtMT
+AwNjY4NDY5OV19
 -->
