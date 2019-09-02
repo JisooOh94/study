@@ -3,11 +3,16 @@
 
 ### 목차
 [1. 의미있는 이름]([https://github.com/JisooOh94/study/blob/master/CleanCode/Content/2.%20%EC%9D%98%EB%AF%B8%EC%9E%88%EB%8A%94%20%EC%9D%B4%EB%A6%84.md](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/2.%20%EC%9D%98%EB%AF%B8%EC%9E%88%EB%8A%94%20%EC%9D%B4%EB%A6%84.md))
+
 2. 함수
+
 3. 주석
+
 4. 코드작성형식
+
 5. 객체와 자료구조
+
 6. 오류처리
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTg0MDMzMjM4OCw2MTA2NjY5NzhdfQ==
+eyJoaXN0b3J5IjpbMTY4ODIxNTkyNiw2MTA2NjY5NzhdfQ==
 -->
