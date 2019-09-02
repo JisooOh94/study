@@ -1,5 +1,5 @@
-# Clean Code
-* Cleane Code 책을 읽고 학습한 내용을 정리하는 repo입니다.
+# HTTP 완벽가이드
+* HTTP 완벽가이드 책을 읽고 학습한 내용을 정리하는 repo입니다.
 
 ### 목차
 [1. 웹 서버 개요]()
@@ -28,5 +28,6 @@
 
 [10. 사용자 식별]()
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTQ5MjQyNDA3MywtMTAwNjY4NDY5OV19
+eyJoaXN0b3J5IjpbLTEwMjgyNTY3MDIsLTEwMDY2ODQ2OTldfQ
+==
 -->
