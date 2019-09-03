@@ -6,7 +6,7 @@
 
 [2. 함수](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/3.%20%ED%95%A8%EC%88%98.md)
 
-[3. 주석](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/3.%20%ED%95%A8%EC%88%98.md)
+[3. 주석](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/4.%20%EC%A3%BC%EC%84%9D.md)
 
 [4. 코드작성형식](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/5.%20%EC%BD%94%EB%93%9C%20%EC%9E%91%EC%84%B1%20%ED%98%95%EC%8B%9D.md)
 
@@ -14,6 +14,6 @@
 
 [6. 오류처리](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/7.%20%EC%98%A4%EB%A5%98%20%EC%B2%98%EB%A6%AC.md)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTgwOTI5NTE3NCwxNjg4MjE1OTI2LDYxMD
-Y2Njk3OF19
+eyJoaXN0b3J5IjpbLTk4NDcxMTIsLTgwOTI5NTE3NCwxNjg4Mj
+E1OTI2LDYxMDY2Njk3OF19
 -->
