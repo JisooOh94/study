@@ -2,11 +2,11 @@
 * 신입교육시절 학습했던 토비의 Spring 정리 repo입니다. 초창기에 했던 학습이라 내용정리가 잘 안되어있습니다.
 
 ### 목차
-[1.1. 디자인 패턴]()
+[1.1. 디자인 패턴](https://github.com/JisooOh94/study/blob/master/%ED%86%A0%EB%B9%84%EC%9D%98%20Spring/content/1.1.%20%EB%94%94%EC%9E%90%EC%9D%B8%ED%8C%A8%ED%84%B4.md)
 
-[1.2. 팩토리클래스]()
+[1.2. 팩토리클래스](https://github.com/JisooOh94/study/blob/master/%ED%86%A0%EB%B9%84%EC%9D%98%20Spring/content/1.2.%20%ED%8C%A9%ED%86%A0%EB%A6%AC%ED%81%B4%EB%9E%98%EC%8A%A4.md)
 
-[1.3. 스프링 IOC 와 DI]()
+[1.3. 스프링 IOC 와 DI]
 
 [1.4. 스프링 DI]()
 
@@ -38,5 +38,5 @@
 
 [6.4. 스프링 프록시]()
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExMDY1NzM0MzYsOTA2OTAxNzc4XX0=
+eyJoaXN0b3J5IjpbLTE3MTM2MTEwNDgsOTA2OTAxNzc4XX0=
 -->
