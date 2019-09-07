@@ -13,7 +13,9 @@
 [5. 객체와 자료구조](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/6.%20%EA%B0%9D%EC%B2%B4%EC%99%80%20%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0.md)
 
 [6. 오류처리](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/7.%20%EC%98%A4%EB%A5%98%20%EC%B2%98%EB%A6%AC.md)
+
+[7. 경계](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/8.%20%EA%B2%BD%EA%B3%84.md)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTk4NDcxMTIsLTgwOTI5NTE3NCwxNjg4Mj
-E1OTI2LDYxMDY2Njk3OF19
+eyJoaXN0b3J5IjpbLTk1Mzk0ODY5LC05ODQ3MTEyLC04MDkyOT
+UxNzQsMTY4ODIxNTkyNiw2MTA2NjY5NzhdfQ==
 -->
