@@ -11,7 +11,9 @@
 [4. 예외처리](https://github.com/JisooOh94/study/blob/master/JAVA%EC%9D%98%20%EC%A0%95%EC%84%9D/Content/4.%20%EC%98%88%EC%99%B8%EC%B2%98%EB%A6%AC.md)
 
 [5. 람다식](https://github.com/JisooOh94/study/blob/master/JAVA%EC%9D%98%20%EC%A0%95%EC%84%9D/Content/5.%20%EB%9E%8C%EB%8B%A4%EC%8B%9D.md)
+
+[5.2 람다식 활용](https://github.com/JisooOh94/study/blob/master/JAVA%EC%9D%98%20%EC%A0%95%EC%84%9D/Content/5.2.%20%EB%9E%8C%EB%8B%A4%EC%8B%9D%20%ED%99%9C%EC%9A%A9.md)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNDIyOTQ0Mjg3LDE5NDgzODM4OTYsMjA3Mz
-I3NjQxMV19
+eyJoaXN0b3J5IjpbLTExNDY0NDM5Nyw0MjI5NDQyODcsMTk0OD
+M4Mzg5NiwyMDczMjc2NDExXX0=
 -->
