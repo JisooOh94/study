@@ -13,3 +13,5 @@
 [1.4 인스턴스화 불가 클래스](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/1.4%20%EC%9D%B8%EC%8A%A4%ED%84%B4%EC%8A%A4%20%EB%B6%88%EA%B0%80%20%ED%81%B4%EB%9E%98%EC%8A%A4.md)
 
 [1.5 의존성 주입](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/1.5%20%EC%9D%98%EC%A1%B4%EC%84%B1%20%EC%A3%BC%EC%9E%85.md)
+
+[1.6 불필요한 객체 생성 지양](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/1.6%20%EB%B6%88%ED%95%84%EC%9A%94%ED%96%94%20%EA%B0%9D%EC%B2%B4%20%EC%83%9D%EC%84%B1%20%EC%A7%80%EC%96%91.md)
