@@ -18,4 +18,4 @@
 
 [1.7 사용이 끝난 객체 참조는 반드시 해제](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/1.7%20%EB%8B%A4%20%EC%93%B4%20%EA%B0%9D%EC%B2%B4%20%EC%B0%B8%EC%A1%B0%EB%A5%BC%20%ED%95%B4%EC%A0%9C%ED%95%98%EB%9D%BC.md)
 
-[1.8 tyr-with-resources]()
+[1.8 try-with-resources](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/1.8%20try-with-resources.md)
