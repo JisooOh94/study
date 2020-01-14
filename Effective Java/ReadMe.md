@@ -21,3 +21,5 @@
 [1.8 try-with-resources](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/1.8%20try-with-resources.md)
 
 [2.1 Equals 재정의 규칙](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/2.1%20Equals%20%EC%9E%AC%EC%A0%95%EC%9D%98%20%EA%B7%9C%EC%B9%99.md)
+
+[2.2 HashCode 재정의 규칙](https://github.com/JisooOh94/study/blob/master/Effective%20Java/Content/2.2%20hashCode%20%EC%9E%AC%EC%A0%95%EC%9D%98%20%EA%B7%9C%EC%B9%99.md)
