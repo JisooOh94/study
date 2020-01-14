@@ -4,9 +4,13 @@ import java.util.function.Supplier;
 
 public class Main {
     public static void main(String[]args) {
-        Elvis_Generic<String> elvis = new Elvis_Generic<String>();
-        Elvis_Generic<String> elivs = Elvis_Generic.make();
+        Elvis_Generic_Singleton<String> elivs = Elvis_Generic_Singleton.getInstance();
+        elivs.setVar("abc");
+        System.out.println(elivs.getVar());
 
-        Supplier<Elvis_v2> supplier = Elvis_v2::getInstance;
+        Elvis_Generic_Singleton<Integer> elvis_Integer = Elvis_Generic_Singleton.getInstance();
+        System.out.println(elvis_Integer.getVar());
+        elvis_Integer.setVar(5);
+        System.out.println(elvis_Integer.getVar());
     }
 }
