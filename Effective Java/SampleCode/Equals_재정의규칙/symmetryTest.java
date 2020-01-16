@@ -1,11 +1,5 @@
-package Equals_재정의규칙;
-
-import org.junit.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class symmetryTest {
     public static class CaseIgnoreString {
