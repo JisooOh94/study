@@ -59,8 +59,10 @@ public class TransivityTest_2 {
 		@Override
 		public boolean equals(Object obj) {
 			if(obj.getClass() == getClass()){
-				Point_v2 p_2 = (Point_v2)obj;
-				return p_2.x == this.x;
+				ColorPoint_v2 p_2 = (ColorPoint_v2)obj;
+				return p_2.x == this.x && p_2.color == this.color;
+			} else if(obj.getClass() == super.getClass()) {
+				return obj.equals(this);
 			}
 			return false;
 		}
