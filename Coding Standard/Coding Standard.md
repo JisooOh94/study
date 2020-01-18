@@ -22,8 +22,8 @@
 	* valueOf 메서드 사용시 불필요한 레퍼런스 클래스 객체 생성
 * 콜렉션에 들어갈 데이터의 개수가 불변일 경우, ArrayList 대신 array를 사용하는것이 더 효율적
 * ArrayList 사용시, 생성시점에 생성자 파라미터로 리스트 크기를 명시해주는것이 더 효율적
-* loop 수행시, for > iterator > forEach 순으로 성능이 좋음
-	* 10000000 크기의 String list로 테스트 결과 for : 12ms, iterator : 15ms, forEach : 13ms
+* loop 수행시, for > forEach > iterator > lambda순으로 성능이 좋음
+	* 10000000 크기의 String list로 테스트 결과 for : 11ms, forEach : 13ms, iterator : 18mss, lambda : 58(ms)
 * ArrayList, LinkedList 전체삭제시 clear() 보다 참조변수에 null을 할당 또는 새로운 list 할당 하는것이 더빠름
 * String 분할시, split 보다 subString이 더 효율적
 	* Split은 Pattern.compile 객체 및 String 배열 객체를 새로 생성하여 성능이 떨어짐
