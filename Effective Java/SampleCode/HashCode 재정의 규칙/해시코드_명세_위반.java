@@ -1,7 +1,10 @@
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.Test;
 
 public class 해시코드_명세_위반 {
@@ -132,6 +135,19 @@ public class 해시코드_명세_위반 {
 			return index + createDate.hashCode();
 		}
 
+		public int hashCode_HashCodeBuilder() {
+			return HashCodeBuilder.reflectionHashCode(this);
+		}
+
+		public int hashCode_Arrays() {
+			return Arrays.hashCode(new Object[]{this.index, this.createDate, this.serviceType, this.apply, this.checkType, this.endDate, this.idcNo, this.message, this.module, this.ndrive, this.startDate});
+			//return Objects.hash(this.index, this.createDate, this.serviceType);
+		}
+
+		public int hashCode_Objects() {
+			return Objects.hash(this.index, this.createDate, this.serviceType, this.apply, this.checkType, this.endDate, this.idcNo, this.message, this.module, this.ndrive, this.startDate);
+		}
+
 		private boolean equals(Date date1, Date date2) {
 			if (date1 == date2) {
 				return true;
@@ -164,5 +180,9 @@ public class 해시코드_명세_위반 {
 
 		System.out.println(interruptionInfo_1.hashCode());
 		System.out.println(interruptionInfo_2.hashCode());
+
+		System.out.println(interruptionInfo_1.hashCode_Arrays());
+		System.out.println(interruptionInfo_1.hashCode_HashCodeBuilder());
+		System.out.println(interruptionInfo_1.hashCode_Objects());
 	}
 }
