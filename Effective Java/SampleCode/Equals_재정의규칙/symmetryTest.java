@@ -1,6 +1,6 @@
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class symmetryTest {
@@ -28,7 +28,14 @@ public class symmetryTest {
 
         List<CaseIgnoreString> list = new ArrayList<>();
         list.add(caseIgnoreString);
+        //System.out.println(list.contains(caseIgnoreString));
         System.out.println(list.contains(normalStr));
 
+
+        Timestamp timestamp = new Timestamp(12345);
+        Date date = new Date(12345);
+
+        System.out.println(timestamp.equals(date));
+        System.out.println(date.equals(timestamp));
     }
 }
