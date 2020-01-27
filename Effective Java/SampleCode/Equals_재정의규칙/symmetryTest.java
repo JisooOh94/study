@@ -35,6 +35,15 @@ public class symmetryTest {
         Timestamp timestamp = new Timestamp(12345);
         Date date = new Date(12345);
 
+        if(date instanceof Date) {
+            System.out.println("A");
+        }
+        if(date instanceof Timestamp) {
+            System.out.println("B");
+        }
+        if(timestamp instanceof Date) {
+            System.out.println("C");
+        }
         System.out.println(timestamp.equals(date));
         System.out.println(date.equals(timestamp));
     }
