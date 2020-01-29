@@ -49,7 +49,7 @@
 ### 예외처리 및 로깅
 * checkedException 은 uncheckedException으로 감싸서 throw 하여 프로세스가 계속 이어지도록 구현
 * 로그 메시지 생성시 '+' 연산자 대신 slf4j 의 String Formatter를 사용하여 코드 가독성 향상
-    * slf4j logger를 사용하지 않을시 slf4j 의 MessageFormatter.format 메서드 대신 사용
+    * slf4j logger를 사용하지 않을시 slf4j 의 MessageFormatter.arrayFormat 메서드 대신 사용
 * 로그 메시지 생성시 최대한 많은 정보를 포함시켜야 함
     * 어느 메서드의 어느 부분에서 에러가 발생했는지
     * 메서드 파라미터로 어느값이 넘어왔는지
