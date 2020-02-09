@@ -32,6 +32,8 @@
 	* 문자열은 불변객체로서, + 연산시 매번 새로운 문자열 객체 생성
 	* StringBuffer, StringBuilder는 기존 String 객체의 값을 수정하는것이므로 불필요한 객체 생성이 없어 더빠름
 	* StringBuffer와 StringBuilder의 차이는 동기화 여부(StringBuilder는 동기화해주지않으므로 멀티스레딩환경이 아니거나 경쟁이 발생하지 않는다면 성능이 StringBuffer보다 더 좋음)
+* eqauls 메서드 재정의시, 양질의 equals 메서드 재정의 원칙에 맞춰 정의 및 hashCode 메서드도 재정의
+* 컬렉션 내 요소들의 1. 순서가 중요하지 않고, 2. 중복되는 데이터가 없으며, 3. 요소 검색(contains, indexOf 등) 이 쓰일경우 List 대신 Set(HashSet) 사용
 
 ### 클래스
 * 디폴트 클래스 객체를 정의하거나 재사용될 수 있는 클래스 객체들을 정의할시 정적 팩터리 메서드를 통해 정의하여 재사용성 향상 및 가독성 개선
@@ -45,6 +47,7 @@
 * 추상 클래스 대신 인터페이스 + default 메서드 또는 추상골격구현클래스 사용
 * 정적 변수, 메서드로만 이루어진 유틸리티 클래스 구현시 private 생성자를 명시적으로 선언
 	* 내부에 AssertionError(); 를 추가하여 리플렉션을 통한 공격방어
+* 클래스 정의시 가급적 불변 클래스로 정의(private 클래스, private final 멤버필드, setter 메서드 비제공)
 
 ### 예외처리 및 로깅
 * checkedException 은 uncheckedException으로 감싸서 throw 하여 프로세스가 계속 이어지도록 구현
