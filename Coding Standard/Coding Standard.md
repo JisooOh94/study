@@ -1,4 +1,4 @@
-### 코드 작성
+## 코드 작성
 * 삼항 연산자 활용
 * Object.toString() 보다는 String.valueOf(Object) 를 사용하여 NPE 방지
 * String 변수 null check 시 StringUtils.isEmpty() 사용
@@ -35,7 +35,7 @@
 * eqauls 메서드 재정의시, 양질의 equals 메서드 재정의 원칙에 맞춰 정의 및 hashCode 메서드도 재정의
 * 컬렉션 내 요소들의 1. 순서가 중요하지 않고, 2. 중복되는 데이터가 없으며, 3. 요소 검색(contains, indexOf 등) 이 쓰일경우 List 대신 Set(HashSet) 사용
 
-### 클래스
+## 클래스
 * 디폴트 클래스 객체를 정의하거나 재사용될 수 있는 클래스 객체들을 정의할시 정적 팩터리 메서드를 통해 정의하여 재사용성 향상 및 가독성 개선
 * 클래스 생성자 파라미터가 4개 이상이거나 불변클래스일시 생성자 대신 빌더패턴 사용
 * 상태값(멤버변수)을 가지는 클래스 정의시 toString도 함께 재정의
@@ -48,8 +48,9 @@
 * 정적 변수, 메서드로만 이루어진 유틸리티 클래스 구현시 private 생성자를 명시적으로 선언
 	* 내부에 AssertionError(); 를 추가하여 리플렉션을 통한 공격방어
 * 클래스 정의시 가급적 불변 클래스로 정의(private 클래스, private final 멤버필드, setter 메서드 비제공)
+* setter 메서드는 반드시 필요한 경우가 아니면 제공하지 않고 최대한 불변클래스로 설계 
 
-### 예외처리 및 로깅
+## 예외처리 및 로깅
 * checkedException 은 uncheckedException으로 감싸서 throw 하여 프로세스가 계속 이어지도록 구현
 * 로그 메시지 생성시 '+' 연산자 대신 slf4j 의 String Formatter를 사용하여 코드 가독성 향상
     * slf4j logger를 사용하지 않을시 slf4j 의 MessageFormatter.arrayFormat 메서드 대신 사용
@@ -60,10 +61,10 @@
 * debug 로깅은 최대한 하나로 합쳐 코드 가독성 향상
 * 프로젝트의 Exception Handler에서 에러에 대해 로깅해주고 있을시, 별도의 에러로깅 불필요
 
-### 기타
+## 기타
 * 람다식은 디버깅이 어려우므로 1회용 함수에만 사용하고 그외에는 가급적 별도의 함수로 정의하여 사용
 * 기능 구현시, 코드 작성 전 구조 설계부터 선행
 * Objects.requireNonNull
 
-### 데이터베이스
+## 데이터베이스
 * Table join 시 데이터 중복이 발생한다면 차라리 각각의 테이블을 따로 조회하여 데이터를 가져오는것이 더 좋음
