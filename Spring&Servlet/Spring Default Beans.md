@@ -73,3 +73,32 @@ public  class  NotlnServiceException  extends  RuntimeExcept ion { }
 
 ### DefaultHandlerExceptionResolver
 * 위의 두 리졸버로 처리하지 못한 예외를 다루는 마지막 리졸버
+
+***
+# 그 외의 Bean들
+### MultipartResolver
+* Spring MVC 프레임워크에서 제공하는 파일업로드 기능 구현 클래스
+* Multipart 형식으로 전송된 파라미터와 파일 사용 기능 제공
+### LocaleResolver
+* 지역 정보를 설정해주는 리졸버
+* default 리졸버인 AcceptHeaderLocalResolver는 HTTP 헤더 정보를 통해 지역정보 설정
+### ThemeResolver
+* 테마를 가지고 이를 변경해서 사이트를 구성할 경우, 사용가능한 테마 정보를 설정해주는 리졸버
+### ViewResolver
+* 컨트롤러가 리턴한 뷰 이름에 맞는 뷰 오브젝트를 찾아 Dispatcher Servlet에 반환해주는 리졸버
+### ViewNameTranslator
+* 컨트롤러에서 뷰 이름이나 뷰 오브젝트를 제공해주지 않았을경우, 요청정보(uri등)를 참고하여 자동으로 뷰 이름 생성해주는 리졸버
+
+***
+# 사용자 요청 처리 과정
+1. 사용자 요청 Http 메시지 수신, Dispatcher Servlet에서 가로챔
+2. Dispatcher Servlet에서 Handler Mapping에게 요청 전송
+3. Handler Mapping에서 @RequestMapping을 참고해 사용자 요청을 처리할 Controller 메소드 이름 반환
+4. Dispatcher Servlet이 Controller 메소드 이름과 함께 Handler Adapter에게 처리를 위임
+4. Handler Adapter가 전달받은 Controller 객체의 메소드 호출
+5. Controller는 bo-dao(DI) 를 통해 전달받은 요청 처리 후 그 결과를 ModelAndView 객체에 담아 반환
+6. ModelAndView 객체에는 요청 처리 결과가 담겨있는 object(addObject)와 응답을 출력해줄 view 객체 이름(addViewName)이 담겨있음
+7. Dispatcher Servlet은 Controller로부터 받은 ModelAndView 객체에서 view name을 추출해 View Resolver에게 전송
+8. View Resolver는 view name에 해당하는 view 객체 반환
+9. Dispatcher Servlet은 반환받은 view객체에 요청처리결과object 추가 및 render 수행
+10. render된 응답결과를 Dispatcher Servlet이 HttpResponse body에 담아 전송
