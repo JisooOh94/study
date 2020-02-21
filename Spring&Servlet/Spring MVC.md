@@ -90,3 +90,39 @@ public String ReadController(HttpServlet request, Model model)throws Exception {
    return "<html><body> ID= <@ ID @>" </body></html>";
 }
 ```
+
+## View Resolver 종류
+
+### UrlBasedViewResolver
+* 논리적인 view 이름과 실제 view 파일 이름이 같을 때 사용
+```
+<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+   <property name="prefix" value="/WEB-INF/view"/>
+   <property name="suffix" value=".jsp"/>
+</bean>
+```
+### InternamResourceViewResolver
+* 뷰 리졸버를 명시적으로 지정하지 않았을때 사용되는 디폴트 뷰 리졸버
+* UrlBasedViewResolver 와 비슷하나 view 호출시 전체 경로와 함께 호출해주어야 해서 prefix,subfix와 함께 사용하는것이 필수
+### ResourceBundleViewResolver
+* 하나의 웹 어플리케이션에서 여러개의 view를 사용하고 또 코드 외부에서 각 컨트롤러가 사용하는 view의 종류를 자주 바꿔줘야 할때, 외부 property 파일을 통해 바꿀 수 있는 View Resolver
+```
+applicaioncontext.xml
+<bean class="org.springframework.web.servlet.view.ResourceBundleViewResolver"/>
+
+configuration.property
+read.(class) = org.springframework.web.servlet.view.JstlView;
+read.url = /WEB-INF/view/showUserInfo.jsp
+```
+
+# Spring MVC 사용자 요청 처리 과정
+![image](https://media.oss.navercorp.com/user/13474/files/b82b98ea-5792-11e9-9fae-43730a3a9512)
+1. 사용자 요청 Http 메시지 수신
+2. Dispatcher Servlet에서 Handler Mapping에게 요청 전송
+3. Handler Mapping에서 사용자 요청을 처리할 Controller 이름 반환
+4. Dispatcher Servlet이 Handler Mapping에게 전달받은 Controller에게 요청 전송
+5. Controller는 bo-dao 를 통해 전달받은 요청 처리 후 그 결과를 ModelAndView 객체에 담아 반환
+6. ModelAndView 객체에는 요청 처리 결과가 담겨있는 object(addObject)와 응답을 출력해줄 view 객체 이름(addViewName)이 담겨있음
+7. Dispatcher Servlet은 Controller로부터 받은 ModelAndView 객체에서 view name을 추출해 View Resolver에게 전송
+8. View Resolver는 view name에 해당하는 view 객체 반환
+9. Dispatcher Servlet은 반환받은 view에 요청처리결과object를 담아 최종적으로 response
