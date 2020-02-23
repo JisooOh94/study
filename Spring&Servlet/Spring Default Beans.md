@@ -73,6 +73,7 @@ public  class  NotlnServiceException  extends  RuntimeExcept ion { }
 
 ### DefaultHandlerExceptionResolver
 * 위의 두 리졸버로 처리하지 못한 예외를 다루는 마지막 리졸버
+
 ***
 # 그 외의 Bean들
 ### MultipartResolver
