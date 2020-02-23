@@ -48,7 +48,6 @@ public class Varargs {
 		Object[] objList = stringArr;
 		List<Integer> list = Arrays.asList(1,2);
 		objList[0] = list;
-		stringArr[0] = list;
 		//arr = pickTwo(1,2,3);
 	}
 }
