@@ -25,3 +25,19 @@
 |minIdle|커넥션풀에 유지되야하는 최소 커넥션 수|
 |maxWaitMillis|커넥션풀에 free상태의 커넥션이 없을때, 커넥션을 요청한 스레드의 최대 대기 시간|
 |poolPreparedStatement|자주 실행되는 Statement를 사전에 Prepare하여 어플리케이션이 직접 호출 가능한 Common pool에 저장해두는 기능|
+
+* maxTotal 과 maxIdle 의 수는 같에 설정하는것이 바람직하다. 그렇지 않을경우, maxTotal - maxIdle 만큼의 커넥션들은 매번 요청이 올때마다 생성되고 삭제되고, 이는 서버에 부하를 발생시킨다.
+* maxWaitMillis 의 경우 default 값은 -1로 무한정 대기를 의미. 무한정 대기로 설정될 경우, 사용자 요청이 몰렸을때, 요청들이 커넥션을 할당받을때까지 무한정대기하게 되므로 계속해서 쌓이게 되고, 결국Tomcat 서버 스레드가 고갈되어 서버 자체가 죽어버리는 문제 발생\
+* 적절한 maxWaitMillis 를 설정하고자 할 경우, 웹애플리케이션의 TPS 와 Tomcat 서버의 스레드 수를 고려하여 설정
+
+### Connection Validation 관련 속성들
+| 속성 | Description|
+|:----:|:-----------|
+|validationQuery|커넥션 유효성 검사시에 사용할 쿼리문|
+|testOnBorrow|커넥션풀에서 커넥션을 받아올때, 해당 커넥션이 유요한지 검사|
+|testOnReturn|커넥션풀에 커넥션을 반환할때, 해당 커넥션이 유효한지 검사|
+|testWhileIdle|커넥션풀에 대기중인 free상태의 커넥션이 대기시간이 길어져 결국 끊어지는것을 방지하기 위해 validationQuery를 수행하도록 하는것|
+
+* validationQuery의 경우 서버 리소스를 최대한 적제 사용하는 쿼리문으로 설정(select 1 from db_root)
+* validation에 서버 리소스를 너무 많이 사용하는것은 지나친 낭비이므로 보통 testOnBorrow 와 testOnReturn은 사용하지 않음
+* Cubrid의 경우 자체적으로 장시간 대기상태인 커넥션을 다시 refresh해주는 기능을 수행하므로 testWhileIdle 또한 비활성화
