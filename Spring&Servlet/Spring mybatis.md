@@ -61,3 +61,147 @@ session.close()
 ### SqlSession
 * Thread-Safe 하지 않으므로 공유자원이 되어서는 안됨
 * Http 요청이 들어올때마다 SqlSessionFactory에 의해 새로 생성되고 해당 요청을 처리하는 스레드동안만 유지되다가 Http 응답을 보낼때 소멸되는 thread scope로 생성
+
+# MyBatis 예제 
+### 1. pom.xml 설정
+```
+pom.xml
+... 위에 생략
+<!-- 1. MyBatis 디펜던시 -->
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis</artifactId>
+    <version>3.4.6</version>
+</dependency>
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis-spring</artifactId>
+    <version>1.3.2</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-jdbc</artifactId>
+    <version>5.1.5.RELEASE</version>
+</dependency>
+ 
+<!-- 2. MySQL 커넥터 -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.12</version>
+</dependency>
+... 아래 생략
+```
+
+### 2. applicationContext.xml 설정
+```
+applicationContext.xml
+... 위에 생략
+<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    <property name="url" value="jdbc:mysql://127.0.0.1:3306/test?useSSL=false&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC" />
+    <property name="username" value="[현재 사용중인 MySQL 사용자명]" />
+    <property name="password" value="[현재 사용중인 MySQL 사용자 비번]" />
+</bean>
+ 
+<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource" />
+    <property name="configLocation" value="classpath:/mybatis-config.xml" />
+    <property name="mapperLocations" value="classpath:/mappers/**/*Mapper.xml" />
+</bean>
+ 
+<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" destroy-method="clearCache">
+    <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/>
+</bean>
+... 아래 생략
+```
+
+### 3. mybatis 설정 파일 생성하기
+src > main > resources > mybatis-config.xml 파일 생성
+```
+mybatis-config.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+ 
+    </typeAliases>
+</configuration>
+```
+
+### 4. SQL문을 저장할 mappers 디렉토리 생성하기
+src > main > resources > mappers 디렉토리 생성
+
+### 5. 테스트 매퍼 작성
+```
+testMapper.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.testMapper">
+ 
+    <insert id="insert">
+        insert into
+            tbl_user (id)
+            values ('test')
+    </insert>
+ 
+</mapper>
+```
+
+### 6. DataSource 테스트
+src > main > test > java > com.worksmobile.testapp.test 하위에 TestDatabase 클래스 작성
+```java
+TestDatabase.java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:web/WEB-INF/applicationContext.xml")
+public class TestDatabase {
+ 
+    @Autowired
+    private DataSource dataSource;
+ 
+    @Test
+    public void testDataSource() throws Exception {
+        System.out.println(dataSource.getConnection());
+    }
+ 
+}
+```
+
+### 7. SqlSession 테스트
+```java
+TestDatabase.java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:web/WEB-INF/applicationContext.xml")
+public class TestDatabase {
+ 
+    @Autowired
+    private DataSource dataSource;
+ 
+    @Autowired
+    private SqlSession sqlSession;
+ 
+    @Test
+    public void testDataSource() throws Exception {
+        System.out.println(dataSource.getConnection());
+    }
+ 
+    @Test
+    public void testSqlSession(){
+        System.out.println(sqlSession.getConnection());
+    }
+}
+```
+
+### 8. 데이터 삽입 테스트
+```java
+TestDatabase.java
+... 위에 생략
+@Test
+public void testInsertColumn(){
+    sqlSession.insert("mappers.testMapper" + ".insert");
+}... 아래 생략
+```
