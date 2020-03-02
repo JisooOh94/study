@@ -88,3 +88,49 @@ public class UserDaoMock extends UserDao {
 3. thenReturn(T value) : 지정한 값 반환
 4. thenReturn(T value, T value...) : 지정한 값들을 순차적으로 반환
 5. thenThrow(Throwable e) : 예외 객체 반환
+
+# Argument Matchers
+* 테스트 하고자 하는 기능에 전달할 파라미터 타입을 검증하는 기능
+* anyInt(), anydouble()...
+* Stubbing 의 when- then 과 함께 사용
+```
+when(mockObj.getSum(anyInt())).thenReturn(10);
+```
+
+# 메소드 실행 여부, 횟수 확인
+* verify 이용
+* 테스트하고자 하는 메소드가 특정조건으로 몇회 실행되었는지 검증
+* verify(T mock, VerificationMode mode).method()
+### VerificationMode
+| Mode | Description |
+|:----:|:------------|
+|atLeastOnce|1번 이상 수행했는지 검증|
+|atLeast(int n)|n 번 이상 수행했는지 검증|
+|times(int n)|n 번 수행했는지 검증|
+|atMost(int n)|최대 n번 수행했는지 검증|
+|never()|수행되지 않았는지 검증|
+
+# 메소드 실행 순서 확인
+* inOrder 객체를 사용하여 메소드들이 의도한 순서대로 수행되었는지 확인
+```
+public class Multiplyer{
+   public int getMult(int a, int b){
+      return a*b;
+   }
+}
+
+public void test(){
+   Multiplyer firstMultiplyer = mock(Multiplyer.class);
+   Multiplyer SecondMultiplyer = mock(Multiplyer.class);
+
+   // mock이 순서대로 실행되는지 확인하기 위해 inOrder 객체에 mock을 전달
+   InOrder inOrder = inOrder(firstMock, secondMock);
+
+   // firstMock이 secondMock 보다 먼저 실행되는 것을 확인
+   inOrder.verify(firstMultiplyer).getMult(1,2);
+   inOrder.verify(SecondMultiplyer).getMult(3,4);
+}
+```
+# injectMocks
+* 한 클래스의 목 객체 생성시, 해당 클래스 멤버변수 오브젝트가 있을경우 목 객체 리스트에서 찾아 자동으로 주입
+* @Mock 어노테이션 대신에 @InjectMocks 어노테이션 사용
