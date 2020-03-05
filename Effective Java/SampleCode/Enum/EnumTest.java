@@ -35,7 +35,7 @@ public class EnumTest {
 	@Test
 	public void test2() {
 		EnumMap<Foo, Bar> map = new EnumMap<Foo, Bar>(Foo.class);
-		for(Foo foo : Foo.values()) { map.put(foo, new HashSet<>());}
+		for(Foo foo : Foo.values()) { map.put(foo, new Bar());}
 		Bar bar = new Bar();
 		bar.foo = Foo.foo;
 
