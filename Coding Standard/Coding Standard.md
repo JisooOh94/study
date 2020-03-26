@@ -34,6 +34,11 @@
 	* StringBuffer와 StringBuilder의 차이는 동기화 여부(StringBuilder는 동기화해주지않으므로 멀티스레딩환경이 아니거나 경쟁이 발생하지 않는다면 성능이 StringBuffer보다 더 좋음)
 * eqauls 메서드 재정의시, 양질의 equals 메서드 재정의 원칙에 맞춰 정의 및 hashCode 메서드도 재정의
 * 컬렉션 내 요소들의 1. 순서가 중요하지 않고, 2. 중복되는 데이터가 없으며, 3. 요소 검색(contains, indexOf 등) 이 쓰일경우 List 대신 Set(HashSet) 사용
+* 제네릭 사용시, 타입 안전함에도 형변환 경고문구가 사라지지 않는다면 @SuppressWarnings로 경고 무시 후 그 이유 주석으로 달기 
+* 배열보다 리스트가 컴파일단계에서 Type Safe 하므로 배열보단 리스트 사용
+* 모델 클래스의 toString override 에서 멤버필드 반환시 ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE); 사용
+* Map의 키값이 Enum 타입일 경우, 무조건 EnumMap 사용(10만번 get 수행 시간 - HashMap : 21ms, EnumMap : 4ms)
+
 
 ## 클래스
 * 디폴트 클래스 객체를 정의하거나 재사용될 수 있는 클래스 객체들을 정의할시 정적 팩터리 메서드를 통해 정의하여 재사용성 향상 및 가독성 개선
@@ -48,7 +53,9 @@
 * 정적 변수, 메서드로만 이루어진 유틸리티 클래스 구현시 private 생성자를 명시적으로 선언
 	* 내부에 AssertionError(); 를 추가하여 리플렉션을 통한 공격방어
 * 클래스 정의시 가급적 불변 클래스로 정의(private 클래스, private final 멤버필드, setter 메서드 비제공)
-* setter 메서드는 반드시 필요한 경우가 아니면 제공하지 않고 최대한 불변클래스로 설계 
+* setter 메서드는 반드시 필요한 경우가 아니면 제공하지 않고 최대한 불변클래스로 설계
+* 상속관계의 클래스 구조 설계시, 추상 클래스보단 인터페이스 + default 메서드로 구현
+*  
 
 ## 예외처리 및 로깅
 * checkedException 은 uncheckedException으로 감싸서 throw 하여 프로세스가 계속 이어지도록 구현
