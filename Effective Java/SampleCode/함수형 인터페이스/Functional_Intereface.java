@@ -53,4 +53,13 @@ public class Functional_Intereface {
 
 		logger.info(String.valueOf(num));
 	}
+
+	public int multiplier(int num) {
+		return num * num;
+	}
+
+	@Test
+	public void test_3() {
+		Sample sample = new Sample(this::multiplier);
+	}
 }
