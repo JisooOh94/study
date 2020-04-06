@@ -2,8 +2,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.junit.Test;
 
@@ -36,5 +38,6 @@ public class MethodRef {
 		Integer integer = 5;
 		int result = integer.sum(1, 3);
 		System.out.println(result);
+		List<Integer> list = new LinkedList<>();
 	}
 }
