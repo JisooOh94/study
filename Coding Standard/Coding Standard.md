@@ -25,7 +25,7 @@
 * loop 수행시, for > forEach > iterator > lambda순으로 성능이 좋음
 	* 10000000 크기의 String list로 테스트 결과 for : 11ms, forEach : 13ms, iterator : 18mss, lambda : 58(ms)
 * ArrayList, LinkedList 전체삭제시 clear() 보다 참조변수에 null을 할당 또는 새로운 list 할당 하는것이 더빠름
-* String 분할시, split 보다 subString이 더 효율적
+* 문자열 분할시, split 보다 subString이 더 효율적
 	* Split은 Pattern.compile 객체 및 String 배열 객체를 새로 생성하여 성능이 떨어짐
 	* SubString은 원본배열 참조변수 및 offset(시작위치), count(개수) 변수만 가지므로 더빠름
 * 문자열 결합시 + 연산자보다 StringBuffer/StringBuilder 를 통한 결합이 더 빠름
@@ -35,8 +35,7 @@
 * eqauls 메서드 재정의시, 양질의 equals 메서드 재정의 원칙에 맞춰 정의 및 hashCode 메서드도 재정의
 * 컬렉션 내 요소들의 1. 순서가 중요하지 않고, 2. 중복되는 데이터가 없으며, 3. 요소 검색(contains, indexOf 등) 이 쓰일경우 List 대신 Set(HashSet) 사용
 * 제네릭 사용시, 타입 안전함에도 형변환 경고문구가 사라지지 않는다면 @SuppressWarnings로 경고 무시 후 그 이유 주석으로 달기 
-* 배열보다 리스트가 컴파일단계에서 Type Safe 하므로 배열보단 리스트 사용
-* 모델 클래스의 toString override 에서 멤버필드 반환시 ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE); 사용
+* toString 재정의 할때 모든 멤버필드 반환시 ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE); 사용
 * Map의 키값이 Enum 타입일 경우, 무조건 EnumMap 사용(10만번 get 수행 시간 - HashMap : 21ms, EnumMap : 4ms)
 * 컬렉션 Raw타입은 컴파일러가 타입체크를 못해주므로 사용 지양
 * 메서드 파라미터로 컬렉션 사용시 wildcard ?를 통해 범용성 높일 수 있음
@@ -45,11 +44,11 @@
 * 와일드카드보단 타입매개변수 사용(얻는 이점(가독성)에 비해 손해(매개변수로만 사용가능, 데이터수정시 도우미 메서드 필요))가 더 큼
 * 가변인수 메서드의 가변인수타입이 제네릭일 경우, 그 값을 받는 객체는 Raw 타입이거나 Object 타입이면 안된다.
 * 열거 타입별(혹은 그룹별) 다르게 동작하는 메서드 필요시. 타입별 메서드 구현 사용
-* List<EnumType> 을 사용할 경우, Set<EnumType>으로 대체
+* ```List<EnumType>``` 을 사용할 경우, ```Set<EnumType>``` 으로 대체
 * 비공개 api(내부적으로만 쓰이는 private 메서드)에서 파라미터 validation 시 assert 이용
 * 메서드 파라미터 validation 을 메서드 내부에서 쓰이는 또다른메서드가 수행시, 외부메서드에선 생략
 * 재사용성이 높을것이라 예상되는 메서드를 제외하곤 가급적 유틸메서드 추가 지양
-* 메서드 매개변수가 4개 이상일경우, 메서드를 분리하거나, 매개변수들을 묶은 클래스를 정적 멤버클래스로 정의하여 클래스 객체 전달
+* 메서드 매개변수가 4개 이상일경우, 메서드를 분리하거나, 매개변수들을 묶은 정적 멤버클래스로 정의하여 클래스 객체 전달
 * 메서드가 boolean 타입 파라미터를 가지고 있을시, 원소 2개짜리 멤버 enum 정의하여 대체(가독성 증가)
 * 메서드 반환값이 null 일경우, 가급적 null 대신 Empty Object 반환
 
