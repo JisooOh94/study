@@ -15,7 +15,5 @@
 [6. 오류처리](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/7.%20%EC%98%A4%EB%A5%98%20%EC%B2%98%EB%A6%AC.md)
 
 [7. 경계](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/8.%20%EA%B2%BD%EA%B3%84.md)
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTk1Mzk0ODY5LC05ODQ3MTEyLC04MDkyOT
-UxNzQsMTY4ODIxNTkyNiw2MTA2NjY5NzhdfQ==
--->
+
+[8. 단위테스트](https://github.com/JisooOh94/study/blob/master/CleanCode/Content/9.%20%EB%8B%A8%EC%9C%84%20%ED%85%8C%EC%8A%A4%ED%8A%B8.md)
