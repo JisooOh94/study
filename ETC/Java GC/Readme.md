@@ -7,4 +7,4 @@
 ### 참고 사이트
 * [Naver D2](https://d2.naver.com/helloworld/1329)
 * [Line Developers](https://engineering.linecorp.com/ko/blog/go-gc/)
-* [기계인간 John Grib](https://johngrib.github.io/wiki/jvm-memory/)
+* [기계인간 John Grib](thttps://johngrib.github.io/wiki/jvm-memory/)

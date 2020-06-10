@@ -26,9 +26,9 @@
 * old generation 영역에서 수행되는 GC 를 major GC 라 명칭
 
 ### (기타) permanent generation 영역
-* 상수 데이터 / 클래스, 메서드 메타데이터 / JVM, JIT 관련 데이터들이 저장되는 영역
-* 해당 영역의 데이터들은 오래동안 유지되긴 하나, 영원하지 않고 종종 수행되는 GC 에 의해 정리되기도 함
-* perm gen에서 수행되는 GC 도 major GC 에 들어감
+* 런타임에 참조되는 클래스의 메타데이터 저장 영역
+* 런타임에 참조되는 새로운 클래스의 메타데이터를 저장할 영역이 부족하다면 Permanent Generation 영역에 대한 GC 수행(더이상 참조되고 있지 않은 클래스 메타데이터 삭제)
+* permanent generation 영역에 대한 GC 는 Full GC (Major GC 를 포함한 Heap 영역 전체에 대한 GC) 에 포함되어있음.
 * Java 8 부터 Metaspace로 대체됨
 
 ### white barrier
@@ -37,3 +37,4 @@
 * young generation 영역의 경우 크기가 작아 저장되어있느 모든 객체의 참조를 조사하는데에 오래걸리지 않으나, old generation 영역의 경우 매우 오래걸림
 * 따라서 old 객체 > young 객체의 참조가 생성될경우, 이를 512 바이트의 chunk로 구성되어있는 카드테이블에 기록
 * minor gc 시 모든 old 영역을 조사하는것이 아닌, 카드 테이블만 조사하여 young 객체 참조 유지 여부 확인
+
