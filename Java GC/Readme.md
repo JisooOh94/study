@@ -5,6 +5,7 @@
 1. [Java GC 개요](https://github.com/JisooOh94/study/blob/master/Java%20GC/1.%20Java%20GC%20%EA%B0%9C%EC%9A%94.md)
 2. [minor GC](https://github.com/JisooOh94/study/blob/master/Java%20GC/2.%20minor%20GC.md)
 3. [GC 종류](https://github.com/JisooOh94/study/blob/master/Java%20GC/3.%20GC%20%EC%A2%85%EB%A5%98.md)
+4. [G1GC](https://github.com/JisooOh94/study/blob/master/Java%20GC/4.%20G1GC.md)
 ### 참고 사이트
 #### Hotspot VM GC 과정
 * https://d2.naver.com/helloworld/1329
