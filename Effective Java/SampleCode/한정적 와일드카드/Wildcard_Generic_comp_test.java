@@ -21,4 +21,14 @@ public class Wildcard_Generic_comp_test {
 		List<Double> list_2 = Arrays.asList(1.1, 1.2, 1.3);
 		List<? extends Number> resultList = union(list_1, list_2);
 	}
+
+	private void printElems(List<String> list) {
+		System.out.println(list.toString());
+	}
+
+	@Test
+	public void test3() {
+		List<? extends String> list = Arrays.asList("1", "2");
+		printElems((List<String>) list);
+	}
 }
