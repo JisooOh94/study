@@ -1,8 +1,12 @@
+import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections4.MapUtils;
 import org.junit.Test;
 import com.sun.corba.se.impl.orb.ParserTable;
 
@@ -40,5 +44,11 @@ public class EnumTest {
 		bar.foo = Foo.foo;
 
 		map.put(bar.foo, bar);
+
+		Map<String, BigDecimal> mapp = new HashMap<>();
+		mapp.put("A", new BigDecimal(1234.123456789));
+
+		long val = MapUtils.getLong(mapp, "A");
+		System.out.println(val);
 	}
 }
