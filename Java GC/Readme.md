@@ -21,3 +21,4 @@
 * https://johngrib.github.io/wiki/java-g1gc/
 * https://initproc.tistory.com/entry/G1-Garbage-Collection
 * https://yckwon2nd.blogspot.com/2014/04/garbage-collection.html
+* https://www.infoq.com/articles/tuning-tips-G1-GC/
