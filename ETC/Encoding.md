@@ -16,3 +16,30 @@
 > * https://bbolmin.tistory.com/46
 > * https://effectivesquid.tistory.com/entry/Base64-%EC%9D%B8%EC%BD%94%EB%94%A9%EC%9D%B4%EB%9E%80
 
+# url encoding
+* url은 모두 아스키 코드로 인코딩하여 전송되는데, 아스키코드 셋에 없는 특수문자등이 url에 포함되어있는경우 별도의 인코딩을하여 문자가 깨지는것 방지
+* url의 스킴과 호스트를 제외한 모든 내용 인코딩 가능(url path, 쿼리 파라미터 등) 
+
+### url encoding 이 필요한 경우
+1. 영어 외에 다른 나라의 언어
+2. 공백(space) 등과 같은 아스키 코드셋에 없는 특수문자
+3. 예약어가 아닌, url 문자로 사용된 url예약어(?, & 등)
+
+### 인코딩 방법
+1. 인코딩이 필요한 문자들을 탐색
+   > www.naver.com/test/나?param=hello ?% > '나', ' ', '?', '%'
+
+2. 탐색한 문자를 16진수의 utf-8 로 인코딩
+   > '나' = EB
+   > ' ' = 20
+   > '?' = 3F
+   > '%' = 25
+   
+3. 인코딩한 문자에 % prefix 추가.
+   > '나' = %EB
+   > ' ' = %20
+   > '?' = %3F
+   > '%' = %25
+
+4. url 전송
+   > www.naver.com/test/%EB?param=hello%20%3F%25
