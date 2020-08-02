@@ -16,3 +16,5 @@
 [6. 서브넷 마스크](https://github.com/JisooOh94/study/blob/master/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC/6.%20%EC%84%9C%EB%B8%8C%EB%84%B7%EB%A7%88%EC%8A%A4%ED%81%AC.md)
 
 [7. 라우터](https://github.com/JisooOh94/study/blob/master/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC/7.%20%EB%9D%BC%EC%9A%B0%ED%84%B0.md)
+
+[8. OSI 7 Layer](https://github.com/JisooOh94/study/blob/master/%EB%84%A4%ED%8A%B8%EC%9B%8C%ED%81%AC/8.%20OSI%207%20Layer.md)
