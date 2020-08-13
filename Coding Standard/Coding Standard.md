@@ -60,6 +60,7 @@
 * 코드 가독성 및 실수 방지 측면에서 foreach > for > while 
 * 난수 생성시, Random 보다 ThreadLocalRandom 이 더 효율적(Java 7 이상부터 사용 가능)
 * 직렬화(Serialization) 가능 클래스 정의시 직렬화 프록시 패턴 사용
+* 불변 Collections 사용시 Collections.unmodifiable 사용(final 로 불변 불가능) 
 
 ## 람다
 * 람다식 사용시, 람다식내에 코드가 1줄이상이면 안되고, 람다식만으로 식의 동작이 설명이 충분히 되어야함
