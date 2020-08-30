@@ -27,7 +27,7 @@
 [9. HTTP 2.0](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/9.%20Http%202.0.md)
 
 [10. 사용자 식별](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/10.%20%EC%82%AC%EC%9A%A9%EC%9E%90%20%EC%8B%9D%EB%B3%84.md)
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNDU4NTI3NjcsLTEwMjgyNTY3MDIsLT
-EwMDY2ODQ2OTldfQ==
--->
+
+[11. HTTPS 및 메시지 암호화](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/11.%20HTTPS%20%EB%B0%8F%20%EB%A9%94%EC%8B%9C%EC%A7%80%20%EC%95%94%ED%98%B8%ED%99%94.md)
+
+[12. SSL HandShake](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/12.%20SSL%20HandShake.md)
