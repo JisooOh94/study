@@ -11,6 +11,10 @@
 
 [4. 메모리 가상화](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/4.%20%EB%A9%94%EB%AA%A8%EB%A6%AC%20%EA%B0%80%EC%83%81%ED%99%94.md)
 
-[5. 메모리 빈 공간 관리](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/5.%20%EB%A9%94%EB%AA%A8%EB%A6%AC%20%EB%B9%88%20%EA%B3%B5%EA%B0%84%20%EA%B4%80%EB%A6%AC.md)
+[5. 가상주소 변환](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/5.%20%EA%B0%80%EC%83%81%EC%A3%BC%EC%86%8C%20%EB%B3%80%ED%99%98.md)
+
+[6. 세그멘테이션](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/6%2C%20%EC%84%B8%EA%B7%B8%EB%A9%98%ED%85%8C%EC%9D%B4%EC%85%98.md)
+
+[7. 메모리 빈 공간 관리](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/5.%20%EB%A9%94%EB%AA%A8%EB%A6%AC%20%EB%B9%88%20%EA%B3%B5%EA%B0%84%20%EA%B4%80%EB%A6%AC.md)
 
 [6. 병행성](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/6.%20%EB%B3%91%ED%96%89%EC%84%B1.md)
