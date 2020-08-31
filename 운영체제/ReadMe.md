@@ -17,4 +17,4 @@
 
 [7. 메모리 빈 공간 관리](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/5.%20%EB%A9%94%EB%AA%A8%EB%A6%AC%20%EB%B9%88%20%EA%B3%B5%EA%B0%84%20%EA%B4%80%EB%A6%AC.md)
 
-[6. 병행성](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/6.%20%EB%B3%91%ED%96%89%EC%84%B1.md)
+[10. 병행성](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/6.%20%EB%B3%91%ED%96%89%EC%84%B1.md)
