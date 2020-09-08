@@ -24,3 +24,5 @@
 [10. 메모리 스왑](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/10.%20%EB%A9%94%EB%AA%A8%EB%A6%AC%20%EC%8A%A4%EC%99%91.md)
 
 [11. 병행성](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/11.%20%EB%B3%91%ED%96%89%EC%84%B1.md)
+
+[12. lock](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/12.%20lock.md)
