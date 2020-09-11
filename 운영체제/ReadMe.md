@@ -26,3 +26,5 @@
 [11. 병행성](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/11.%20%EB%B3%91%ED%96%89%EC%84%B1.md)
 
 [12. lock](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/12.%20lock.md)
+
+[13. 컨디션 변수](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/13.%20%EC%BB%A8%EB%94%94%EC%85%98%20%EB%B3%80%EC%88%98.md)
