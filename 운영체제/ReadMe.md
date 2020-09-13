@@ -25,6 +25,9 @@
 
 [11. 병행성](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/11.%20%EB%B3%91%ED%96%89%EC%84%B1.md)
 
-[12. lock](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/12.%20lock.md)
+[12. Mutex(임계영역lock)](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/12.%20Mutex(%EC%9E%84%EA%B3%84%EC%98%81%EC%97%AD%20lock).md)
 
-[13. 컨디션 변수](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/13.%20%EC%BB%A8%EB%94%94%EC%85%98%20%EB%B3%80%EC%88%98.md)
+[13. Monitor(컨디션 변수)](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/13.%20Monitor(%EC%BB%A8%EB%94%94%EC%85%98%20%EB%B3%80%EC%88%98).md)
+
+[14. Semaphore](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/14.%20Semaphore.md)
+
