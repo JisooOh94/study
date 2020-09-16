@@ -31,3 +31,4 @@
 
 [14. Semaphore](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/14.%20Semaphore.md)
 
+[15. 데드락](https://github.com/JisooOh94/study/blob/master/%EC%9A%B4%EC%98%81%EC%B2%B4%EC%A0%9C/15.%20%EB%8D%B0%EB%93%9C%EB%9D%BD.md)
