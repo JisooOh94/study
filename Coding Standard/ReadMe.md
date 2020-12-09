@@ -119,3 +119,7 @@
 
 ## 데이터베이스
 * Table join 시 데이터 중복이 발생한다면 차라리 각각의 테이블을 따로 조회하여 데이터를 가져오는것이 더 좋음
+
+## Spring
+* 필드 주입보단 생성자주입 사용(필요한경우에만 수정자 주입)
+* @ComponentScan을 통한 스캔 패키지 경로 명시시, basePackages 대신 basePackageClass 사용 
