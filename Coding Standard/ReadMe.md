@@ -116,10 +116,14 @@
 * 람다식은 디버깅이 어려우므로 1회용 함수에만 사용하고 그외에는 가급적 별도의 함수로 정의하여 사용
 * 기능 구현시, 코드 작성 전 구조 설계부터 선행
 * Objects.requireNonNull
+* API Invoker 개발시, Rest API 보단 Reactive API 로 개발하여 비동기적으로 호출하도록 구현
 
 ## 데이터베이스
 * Table join 시 데이터 중복이 발생한다면 차라리 각각의 테이블을 따로 조회하여 데이터를 가져오는것이 더 좋음
 
 ## Spring
-* 필드 주입보단 생성자주입 사용(필요한경우에만 수정자 주입)
-* @ComponentScan을 통한 스캔 패키지 경로 명시시, basePackages 대신 basePackageClass 사용 
+* 필드 주입보단 수정자 주입이나 생성자주입 사용
+* @ComponentScan을 통한 스캔 패키지 경로 명시시, basePackages 대신 basePackageClass 사용
+* @Autowire 어노테이션을 통한 자동 주입보다는 구성파일을 통한 생성자/수정자 주입 사용
+* Spring 컴포넌트 클래스에 생성, 소멸 콜백메서드 등록시 @PostConstruct/@PreDestroy 어노테이션 사용
+	* init-method/destroy-method 지정, InitializingBean/DisposableBean 인터페이스 상속 사용 지양
