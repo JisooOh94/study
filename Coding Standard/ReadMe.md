@@ -122,8 +122,10 @@
 * Table join 시 데이터 중복이 발생한다면 차라리 각각의 테이블을 따로 조회하여 데이터를 가져오는것이 더 좋음
 
 ## Spring
-* 필드 주입보단 수정자 주입이나 생성자주입 사용
+* Bean 클래스 정의시 최대한 POJO 로 정의
+	* 필드 주입 지양 : 의존성 주입시, 필드 주입보단 수정자 주입이나 생성자주입 사용
+	* @Autowire 지양 : 의존성 주입시, * @Autowire 어노테이션을 통한 자동 주입보다는 구성파일을 통한 생성자/수정자 주입 사용
+	* @Value 지양 : 값 주입시, @Value 어노테이션을 통한 주입보다는 구성파일을 통한 생성사/수정자 주입 사용
 * @ComponentScan을 통한 스캔 패키지 경로 명시시, basePackages 대신 basePackageClass 사용
-* @Autowire 어노테이션을 통한 자동 주입보다는 구성파일을 통한 생성자/수정자 주입 사용
 * Spring 컴포넌트 클래스에 생성, 소멸 콜백메서드 등록시 @PostConstruct/@PreDestroy 어노테이션 사용
 	* init-method/destroy-method 지정, InitializingBean/DisposableBean 인터페이스 상속 사용 지양
