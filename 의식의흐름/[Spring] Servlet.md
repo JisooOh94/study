@@ -6,15 +6,16 @@
 * 서블릿 컨테이너는 요청을 처리할 수 있는 서블릿을 찾아 처리 명령
 
 ### 서블릿 동작 과정
-1. 클라이언트로부터 Http request 수신시, 웹서버는 서블릿 컨테이너에게 Http request 전송
+1. 클라이언트로부터 HttpRequest 수신시, 웹서버는 서블릿 컨테이너에게 HttpRequest 전송
 2. 서블릿 컨테이너는 배포서술자(web.xml) 을 기반으로 클라이언트 요청을 처리할 서블릿 탐색
+	> [배포서술자(web.xml) 에 url - servlet mapping 정보 등록]()
 3. 서블릿 컨테이너는 요청을 처리할 서블릿의 service 메서드 호출하며 HttpServletRequest, HttpServletResponse 객체를 만들어 파라미터로 전송
-4. 서블릿은 service 메서드 내에서 클라이언트 요청에 따라 doGet/doPost 메서드를 호출하여 요청처리, 동적페이지 생성
-5. 생성한 동적페이지를 HttpServletResponse 객체에 담아 웹서버로 응답
+4. service 메서드 내에서 클라이언트 요청에 따라 doGet/doPost 메서드를 호출하여 요청처리, 동적페이지 생성
+5. 생성한 동적페이지를 HttpServletResponse 객체에 담아 컨테이너로 응답
+6. 컨테이너는 HttpServletResponse 객체를 HttpResponse객체로 전환하여 클라이언트로 응답
 
 ![image](https://user-images.githubusercontent.com/48702893/107371810-0f085400-6b28-11eb-9992-6cbe5e287e58.png)
     
-
 ### 서블릿 컨테이너
 * 클라이언트의 요청에 따라 적절한 서블릿을 탐색하여 요청 처리를 명령하는 컨테이너
 * 서블릿 생명주기 관리
@@ -30,4 +31,20 @@
 	* 개발자가 멀티스레드 관리 및 동기화에 신경쓰지 않고 비즈니스 로직 구현에 집중 가능
 * 선언적 보안관리
 	* 비즈니스 로직에 직접 보안관련 작업을 할 필요 없이, 배포 서술자(web.xml) 에 필요한 보안기능을 선언적으로 선언해두면, 컨테이너가 자동으로 인식하여 보안작업 수행
-	* 개발자가 비즈니스 로직개발에 집중할 수 있으며, 코드 재빌드 없이 배포서술자만 수정하여 보안관련 기능 변경 가능 
+	* 개발자가 비즈니스 로직개발에 집중할 수 있으며, 코드 재빌드 없이 배포서술자만 수정하여 보안관련 기능 변경 가능
+	
+### 배포서술자(web.xml) 에 url - servlet mapping 정보 등록
+ 1. servlet 등록 : \<servlet>태그 내에 <servlet-class> 으로 servlet 클래스 경로 명시, <setvlet-name> 으로 등록할 servlet 이름 지정
+ ```xml
+ <servlet>
+ 	<servlet-name>foo</servlet-name>
+ 	<servlet-class>com.naver.Foo</servlet-class>
+ </servlet>
+ ```
+ 2. servlet 맵핑 : <servlet-maaping> 태그 내에 <url-pattern> 으로 처리할 url 명시, <servlet-name> 으로 처리할 servlet 지정
+ ```xml
+<servlet-maaping>
+	<servlet-name>foo</servlet-name>>
+	<url-pattern>.*/get/foo</url-pattern>
+</servlet-maaping>
+```
