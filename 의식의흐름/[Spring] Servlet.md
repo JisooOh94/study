@@ -8,7 +8,7 @@
 ### 서블릿 동작 과정
 1. 클라이언트로부터 HttpRequest 수신시, 웹서버는 서블릿 컨테이너에게 HttpRequest 전송
 2. 서블릿 컨테이너는 배포서술자(web.xml) 을 기반으로 클라이언트 요청을 처리할 서블릿 탐색
-	> [배포서술자(web.xml) 에 url - servlet mapping 정보 등록]()
+	> [배포서술자(web.xml) 에 url - servlet mapping 정보 등록](https://github.com/JisooOh94/study/blob/master/%EC%9D%98%EC%8B%9D%EC%9D%98%ED%9D%90%EB%A6%84/%5BSpring%5D%20Servlet.md#%EB%B0%B0%ED%8F%AC%EC%84%9C%EC%88%A0%EC%9E%90webxml-%EC%97%90-url---servlet-mapping-%EC%A0%95%EB%B3%B4-%EB%93%B1%EB%A1%9D)
 3. 서블릿 컨테이너는 요청을 처리할 서블릿의 service 메서드 호출하며 HttpServletRequest, HttpServletResponse 객체를 만들어 파라미터로 전송
 4. service 메서드 내에서 클라이언트 요청에 따라 doGet/doPost 메서드를 호출하여 요청처리, 동적페이지 생성
 5. 생성한 동적페이지를 HttpServletResponse 객체에 담아 컨테이너로 응답
