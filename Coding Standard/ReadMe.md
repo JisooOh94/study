@@ -62,6 +62,7 @@
 * 직렬화(Serialization) 가능 클래스 정의시 직렬화 프록시 패턴 사용
 * 불변 Collections 사용시 Collections.unmodifiable 사용(final 로 불변 불가능)
 * 원소가 1개인 불변 컬렉션 생성시 Collections.singletonCollection API 사용
+* 2개의 요소를 가진 컬렉션 or Key 를 만들땐 Pair 자료구조 이용
 
 ## 람다
 * 람다식 사용시, 람다식내에 코드가 1줄이상이면 안되고, 람다식만으로 식의 동작이 설명이 충분히 되어야함
