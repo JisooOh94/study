@@ -23,3 +23,26 @@
 ### 처리 과정
 
 ![image](https://user-images.githubusercontent.com/48702893/107381836-99ee4c00-6b32-11eb-8838-a59f46a2b3ce.png)
+
+### 등록 방법
+1. DispatcherServlet 를 타입으로 servlet 등록
+	* contextConfigLocation 초기화 파라미터로 servlet scope 빈 및 설정이 등록되어있는 context.xml 파일 명시
+```xml
+<servlet>
+	<servlet-name>foo</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	<init-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/NAVER/servletContext.xml</param-value>
+	</init-param> 
+</servlet>
+```
+
+2. <servlet-maaping> 태그를 통해 등록한 DispatcherServlet 으로 처리할 url 맵핑
+```xml
+<servlet-maaping>
+	<servlet-name>foo</servlet-name>>
+	<url-pattern>*.nhn</url-pattern>
+</servlet-maaping>
+```
+```

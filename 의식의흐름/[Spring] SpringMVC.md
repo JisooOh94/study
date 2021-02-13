@@ -53,3 +53,41 @@
 	```
 5. View 객체는 model 객체의 데이터를 가지고 Html 페이지 생성, DispatcherServlet 에게 응답
 6. DispatcherServlet 은 페이지를 HttpServletResponse 객체에 담아 웹서버에게 응답
+
+# Spring Context
+### ApplicationContext
+* 웹애플리케이션의 모든 Servlet 에서 공유하는 bean 및 설정을 등록하는 Context
+* 주로 DB 연결 관련 설정 및 bean, logging 관련 설정 및 bean 등록
+* Bean Factory 를 상속받아 IoC 컨테이너로서 동작[[참고]]() 
+* 등록 방법
+	1. web.xml 에서 <context-param> 으로 applicationContext 설정 파일경로 명시
+	2. <listener> 로 ContextLoaderListener 등록
+	3. 서블릿 컨테이너 구동하여, ServletContext 인스턴스가 생성되면, ServletContextListener 를 구현한 ContextLoaderListener가 호출됨
+	4. ContextLoaderListener 는 <context-param> 으로 명시한 설정파일을 읽어들여 ApplicationContext 생성 및 bean 등록, 설정 적용 수행
+```xml
+//web.xml
+<context-param>
+	<param-name>contextConfigLocation</param-name>
+	<param-value>/WEB-INF/NAVER/applicationContext.xml</param-value>
+</context-param>
+
+<listener>
+	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+```
+
+### ServletContext
+* 하나의 Servlet 에서 사용되는 bean 및 설정을 등록하는 Context
+* ApplicationContext 를 상속받으므로 ApplicationContext에 등록된 bean 및 설정들 사용 가능
+* Servlet 등록시, contextConfigLocation 초기화 파라미터로 ServletContext 설정 파일 경로 명시하여 등록
+```xml
+<servlet>
+	<servlet-name>foo</servlet-name>
+	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	<init-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/NAVER/servletContext.xml</param-value>
+	</init-param> 
+</servlet>
+```
+
