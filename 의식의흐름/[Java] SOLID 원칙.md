@@ -298,3 +298,96 @@ public void writeContentLog(Parent parent) {
 		this.date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(modifiedDate);	//부모클래스 불변조건(date 멤버필드 포맷) 위배.
 	}
 	```
+	
+<br>
+
+# 인터페이스 분리 원칙
+* 클라이언트는 자신이 사용하지 않는 불필요한 인터페이스 멤버에 의존성을 가지면 안된다는 원칙
+* 하나의 인터페이스는 하나의 동작만 하도록 인터페이스를 분리 (인터페이스 버전 단일책임원칙 느낌)
+
+### 인터페이스 분리 원칙 위반 예시
+1. 데이터 read, write 관련 기능을 선언한 DataManager 인터페이스 정의 
+```java
+public interface DataManager {
+	int load();
+	void prepare();
+	void save(int data);
+}
+```
+
+2. DataManager 인터페이스를 구현하여 데이터 read 기능을 수행하는 DataLoader 클래스 정의
+```java
+public class DataLoader implements DataManager {
+	public int load() {
+		//do Something
+	}
+	
+	public void prepare(){}
+	
+	public void save(int data){}
+}
+```
+
+3. DataLoader 클래스는 데이터 read 기능만을 담당하므로 load 메서드만 필요하나, DataManager 인터페이스에 여러 책임이 혼재되어있어 필요하지 않은 나머지 메서드도 구현 강제 
+	* 불필요한 코드 발생, 코드 복잡도 증가, 불필요한 인터페이스 멤버에 의존성 생성
+	* DataManager 의 save 인터페이스 수정시, 저장 기능과는 관련없는 DataLoader 클래스도 수정 강제
+
+### 인터페이스 분리를 통한 수정
+1. 하나의 인터페이스가 하나의 기능만 담당하도록 인터페이스 분리
+```java
+public interface DataLoader {
+	int load();
+}
+
+public interface DataPreparer {
+	void prepare();
+}
+
+public interface DataSaver {
+	void save(int data);
+}
+```
+
+2. 분리한 인터페이스 각각을 상속받아 구현하는 구현체 정의
+```java
+public class DataLoaderImpl implements DataLoader {
+	public int load() { ... }
+}
+
+public class DataPreparerImpl implements DataPreparer {
+	public void prepare() { ... }
+}
+
+public class DataSaverImpl implements DataSaver {
+	public void save(int data) { ... }
+}
+```
+
+3. 필요에 따라, 분리된 2개 이상의 인터페이스가 하나의 기능을 위해 필요할시, 다중 구현을 통해 해결 
+```java
+public class DataIncrementWriter implements DataLoader, DataSaver {
+	public int load() { ... }
+	
+	public void save(int data) { ... }
+	
+	public void monthlyDataIncrese() {
+		if(LocalDate.now().getDayOfMonth() == 1) {
+			int data = load();
+			save(data + 1);
+		}
+	}
+}
+```
+
+### 단점
+* 인터페이스를 너무 작은 기능단위까지 분리할경우, 코드 가독성도 떨어지고 복잡성이 올라가며, 구현하는데에도 어려움
+	> 인터페이스 분리 원칙도 최대한 준수하면서 코드 복잡도도 올라가지 않는 적당한 인터페이스 분리 정도 설정하는것이 중요
+	
+
+<br>
+
+# 의존관계역전원칙
+* 다음 설명으로 대체한다.
+1. [제어 역전](https://github.com/JisooOh94/study/blob/master/%EC%A0%84%EB%AC%B8%EA%B0%80%EB%A5%BC%20%EC%9C%84%ED%95%9C%20%EC%8A%A4%ED%94%84%EB%A7%815/1.%20Spring%20%EA%B0%9C%EC%9A%94.md#%EC%A0%9C%EC%96%B4-%EC%97%AD%EC%A0%84inversion-of-control)
+2. [Spring IoC](https://github.com/JisooOh94/study/blob/master/%EC%A0%84%EB%AC%B8%EA%B0%80%EB%A5%BC%20%EC%9C%84%ED%95%9C%20%EC%8A%A4%ED%94%84%EB%A7%815/3.%20Spring%20IoC.md)
+3. [Spring 싱글톤 패턴](https://github.com/JisooOh94/study/blob/master/%EC%A0%84%EB%AC%B8%EA%B0%80%EB%A5%BC%20%EC%9C%84%ED%95%9C%20%EC%8A%A4%ED%94%84%EB%A7%815/3.6%20%EC%8B%B1%EA%B8%80%ED%86%A4%20%ED%8C%A8%ED%84%B4.md)
