@@ -111,16 +111,19 @@ public abstract class ClassLoader {
 
 ## Thread Scope
 ### PC Register
-* 현재 스레드가 수행중인 메서드 코드가 저장되어있는 런타임 상수풀 인덱스 저장
-* 런타임 상수풀에는 Method Area 에 저장되어있는 메서드 바이트 코드의 주소 저장되어있음 
+* 현재 스레드가 수행중인 코드를 가리키는 런타임 상수풀의 인덱스 저장 공간
+* 런타임상수풀엔 바이트코드가 실제저장되어있는 메모리 공간(Method area) 주소가 저장되어있음
+* PC Register 에 저장되어있는 런타임상수풀 인덱스 정보를 통해 바이트코드를 메모리로부터 읽어와 실행엔진이 실행
+
+![KakaoTalk_20210220_154125777](https://user-images.githubusercontent.com/48702893/108586527-74fba380-7392-11eb-9795-223d41417cc4.jpg)
 
 ### JVM Stack
 * 스택 프레임을 저장하는 스택
-* printStackTrace() 를 통해 출력되는 로그의 각 줄은 printStackTrace를 수행한 스레드의 Jvm Stack 에 저장되어있던 스택프레임을 표현
+* printStackTrace() 를 통해 출력되는 로그는 스레드의 Jvm Stack 에 저장되어있던 스택프레임들에 대한 정보
 
 > 스택 프레임
-> * 지역변수 배열, 피연산자 스택, 런타임 상수풀 참조변수 로 구성
-> * 지역변수 배열 : 현재 스레드가 실행중인 메서드의 클래스 인스턴스 this 레퍼런스, 파라미터, 지역변수 저장
+> * 지역변수 배열, 피연산자 스택, 클래스 런타임 상수풀 레퍼런스로 구성
+> * 지역변수 배열 : 현재 스레드가 실행중인 메서드 클래스의 인스턴스 참조(this), 파라미터, 지역변수 저장
 > * 피연산자 스택 : 현재 실행중인 명령어 연산에 필요한 피연산자 데이터들을 저장하는 스택
 
 ### Native Method Stack
@@ -136,8 +139,39 @@ public abstract class ClassLoader {
 * Permanent generation 영역(Java8 부터 Metaspace 로 대체)
 * Class 객체(클래스 메타데이터) 및 클래스 정적 변수, 클래스 바이트코드, 클래스 런타임 상수 풀 저장
 * 클래스 인스턴스 생성 및 메서드 수행을 위한 모든 정보가 저장되는 영역
+* JIT 컴파일러에 의해 컴파일된 Natice 코드가 캐싱되는 공간
 
 ### Runtime Constant Pool
 * 클래스의 모든 상수, 정적 변수 및 Class 객체, 바이트 코드가 저장되어있는 메모리 주소가 기록되어있는 테이블
 * 실행엔진은 메서드 수행시, 바이트코드에 기록되어있는 런타임 상수 풀 인덱스를 기반으로 메모리에서 데이터를 찾아 연산 수행
+```java
+public void add(java.lang.String);  
+Code:  
+0: aload_0  
+1: getfield #15;  //#15 : 런타임상수풀 인덱스
+4: aload_1  
+5: invokevirtual #23;
+8: pop  
+9: return  
+```
+
 * 각 클래스마다 개별적으로 생성됨
+
+<br>
+
+# 실행 엔진
+* PC Register 를 참조하여 바이트 코드를 읽어와 명령어 단위로 수행
+* 바이트 코드 = OpCode + 피연산자
+	* OpCode : 바이트코드 명령어 (e.g. aload_0(데이터 로드), istore(데이터 저장), getfield(클래스 필드 getter), putfield(클래스 필드 setter))
+	* 피연산자 : 런타임 상수풀 인덱스 (e.g. #15)
+	```getfield #15;```
+* 바이트코드를 읽어와 기계어로 변환하여 수행하며 기계어로 변환 방식으로 인터프리터 / JIT 컴파일러 존재 [[참고]](https://github.com/JisooOh94/study/blob/master/JAVA%EC%9D%98%20%EC%A0%95%EC%84%9D/Content/1.%20JAVA%20%EA%B8%B0%EC%B4%88.md#jit-%EC%BB%B4%ED%8C%8C%EC%9D%BC%EB%9F%AC)
+
+### JIT 컴파일러 동작 과정
+
+![image](https://user-images.githubusercontent.com/48702893/108588477-c7da5880-739c-11eb-8fcd-bb4ffabbaa33.png)
+
+* 코드 최적화를 위해 바이트코드를 바이트코드와 네이티브코드의 중간단계 표현인 IR(Intermediate Representation) 로 변환
+* Optimizer 에서 코드 최적화 수행
+* Code Generator 에서 네이티브 코드로 변환하여 수행
+* 코드 수행 횟수를 Profiler 에 기록 > 수행횟수가 많은 코드(Hotspot) 를 네이티브 코드로 컴파일하여 Method Area 에 캐싱
