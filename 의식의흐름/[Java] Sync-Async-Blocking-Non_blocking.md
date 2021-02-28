@@ -31,7 +31,7 @@
 
 <br>
 
-# 복합
+# Sync, Asycn + Blocking, Non Blocking
 
 ![image](https://user-images.githubusercontent.com/48702893/109412849-ac4efd80-79ed-11eb-97e0-301d16e4e7fb.png)
 
