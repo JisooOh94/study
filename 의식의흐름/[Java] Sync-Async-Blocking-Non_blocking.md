@@ -63,7 +63,7 @@
 * 호출함수는 피호출함수의 작업완료를 신경쓰지 않고, 피호출함수가 작업완료시 직접 후처리 로직(callback메서드) 수행
 * 호출함수는 피호출함수의 작업을 기다리거나 확인하지 않고 계속 자신의 작업 수행하므로 완전한 비동기라 할 수 있음
 * callback 메서드를 등록한 비동기 메서드 호출
-![image](https://user-images.githubusercontent.com/48702893/109412882-e7513100-79ed-11eb-8d43-d18b2786486d.png)
 
+![image](https://user-images.githubusercontent.com/48702893/109412882-e7513100-79ed-11eb-8d43-d18b2786486d.png)
 
 > [이미지출처](http://homoefficio.github.io/2017/02/19/Blocking-NonBlocking-Synchronous-Asynchronous/)
