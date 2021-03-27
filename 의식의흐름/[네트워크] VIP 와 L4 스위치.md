@@ -4,10 +4,12 @@
 * 클라이언트는 DNS 에서 알려준 VIP 로 요청을 전송하고, 요청을 수신한 라우터나 스위치에서 요청을 처리할 서버 IP 주소(사설 IP)로 요청 전달
 * 주로 방화벽의 이중화나 로드밸런싱에 사용
 	* 방화벽의 이중화를 통한 폴트 톨러런트 향상
-	![image](https://user-images.githubusercontent.com/48702893/110963541-86363f80-8395-11eb-8425-cc1b3306c731.png)
+	
+	<img src="https://user-images.githubusercontent.com/48702893/110963541-86363f80-8395-11eb-8425-cc1b3306c731.png" width="300" height="300">
 	
 	* L4 스위치를 이용한 로드밸런싱을 통해 부하 분산
-	![image](https://user-images.githubusercontent.com/48702893/110963594-99e1a600-8395-11eb-8d0f-5e457d55107c.png)
+	
+	<img src="https://user-images.githubusercontent.com/48702893/110963594-99e1a600-8395-11eb-8d0f-5e457d55107c.png" width="300" height="300">
 	 
 * 부하 분산 및 폴트 톨러런트 향상
 
