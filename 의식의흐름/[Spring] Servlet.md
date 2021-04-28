@@ -1,10 +1,10 @@
 # 서블릿
-* 동적인 페이지를 생성하는 어플리케이션
-* 일종의 자바로 구현된 [[CGI]](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/8.%20%EA%B2%8C%EC%9D%B4%ED%8A%B8%EC%9B%A8%EC%9D%B4.md#cgi%EA%B3%B5%EC%9A%A9-%EA%B2%8C%EC%9D%B4%ED%8A%B8%EC%9B%A8%EC%9D%B4-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4)
+* 클라이언트의 요청을 처리하고 그 결과를 다시 클라이언트에게 전송하는 Servlet 클래스 객체
+* 일종의 자바로 구현된 [CGI](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/8.%20%EA%B2%8C%EC%9D%B4%ED%8A%B8%EC%9B%A8%EC%9D%B4.md#cgi%EA%B3%B5%EC%9A%A9-%EA%B2%8C%EC%9D%B4%ED%8A%B8%EC%9B%A8%EC%9D%B4-%EC%9D%B8%ED%84%B0%ED%8E%98%EC%9D%B4%EC%8A%A4)
 	* CGI : 웹서버와 외부 어플리케이션(웹어플리케이션) 을 연결하기 위한 표준
+	* 클라이언트가 동적인 페이지 요청시, 웹서버는 서블릿 컨테이너에게 처리 위임
+	* 서블릿 컨테이너는 요청을 처리할 수 있는 서블릿을 찾아 처리 명령
 * 자바 스레드를 통해 동작
-* 클라이언트가 동적인 페이지 요청시, 웹서버는 서블릿 컨테이너에게 처리 위임
-* 서블릿 컨테이너는 요청을 처리할 수 있는 서블릿을 찾아 처리 명령
 
 ### 서블릿 동작 과정
 1. 클라이언트로부터 HttpRequest 수신시, 웹서버는 서블릿 컨테이너에게 HttpRequest 전송
