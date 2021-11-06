@@ -7,7 +7,7 @@
 
 ### 처리 과정
 
-![image](https://user-images.githubusercontent.com/48702893/138546659-8684b339-b824-4d7b-9623-5cbeae3aca14.png)
+<img src="https://user-images.githubusercontent.com/48702893/138546659-8684b339-b824-4d7b-9623-5cbeae3aca14.png" width="400" height="200" />
 
 1. 드라이빙 테이블에서 조건을 만족하는 row 탐색
 2. 탐색된 드라이빙 테이블 row의 조인키 칼럼값으로 드리븐 테이블 탐색(인덱스 scan/테이블 full scan)
@@ -44,7 +44,7 @@
 
 ### 처리과정
 
-![image](https://user-images.githubusercontent.com/48702893/138583908-2d887c63-1af3-4127-beca-63386be6a5e0.png)
+<img src="https://user-images.githubusercontent.com/48702893/138583908-2d887c63-1af3-4127-beca-63386be6a5e0.png" width="400" height="300" />
 
 1. 선행 테이블에서 조건을 만족하는 row 탐색
 2. 탐색된 선행 테이블 row들을 조인키 칼럼 기준으로 정렬
@@ -83,7 +83,7 @@
 
 ### 처리과정
 
-![image](https://user-images.githubusercontent.com/48702893/138591168-b82e3d04-142f-425c-83b4-1130c5e379c7.png)
+<img src="https://user-images.githubusercontent.com/48702893/138591168-b82e3d04-142f-425c-83b4-1130c5e379c7.png" width="400" height="300" />
 
 1. 조인 테이블에서 조건을 만족하는 row 탐색
 > 선행 테이블 scan 과 후행 테이블 scan 은 동시에 독립적으로 수행
