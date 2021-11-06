@@ -16,7 +16,7 @@
 
 [5. HTTP 통신 과정](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/5.%20Http%20%ED%86%B5%EC%8B%A0%EA%B3%BC%EC%A0%95.md)
 
-[6. 프록시](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/6.1%20%ED%94%84%EB%A1%9D%EC%8B%9C.md)
+[6. 프록시](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/6%20%ED%94%84%EB%A1%9D%EC%8B%9C.md)
 
 [7.1. 캐시](https://github.com/JisooOh94/study/blob/master/HTTP%20%EC%99%84%EB%B2%BD%EA%B0%80%EC%9D%B4%EB%93%9C/Content/7.1%20%EC%BA%90%EC%8B%9C.md)
 
