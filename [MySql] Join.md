@@ -90,13 +90,12 @@
 1. 조인 테이블에서 조건을 만족하는 row 탐색
 > 선행 테이블 scan 과 후행 테이블 scan 은 동시에 독립적으로 수행
 2. 탐색된 두 테이블의 rowSet 중 크기가 더 작은 rowSet을 선행테이블(Build Input)로 하여 조인키 칼럼값으로 해시테이블 생성 (Partitioning phase) 
-3. 후행테이블(Prove Input)에서 조건을 만족하는 row 탐색
-4. 후행테이블의 row 가 탐색되면 조인키 칼럼값을 해싱하여 선행테이블의 해시테이블에서 탐색 (Probing phase)
+3. 후행테이블(Prove Input) row 순회하며 조인키 칼럼값을 해싱하여 선행테이블의 해시테이블에서 탐색 (Probing phase)
 > 해쉬 테이블 생성 이후 NL 조인과 동일하게 순차적으로 처리(Driving : 후행테이블, Driven : 선행테이블)
-5. 선행테이블 탐색 성공시 조인하여 추출버퍼에 삽입 후 다음 후행테이블 row 탐색 
+4. 선행테이블 탐색 성공시 조인하여 추출버퍼에 삽입 후 다음 후행테이블 row 탐색 
 
 ### 성능 포인트
-* 대용량 데이터 처리시 해쉬테이블의 크기가 메모리 사이즈(hash_area_size)보다 커질경우 임시영역에 저장하여 성능 저하 발생
+* 대용량 데이터 처리시 해쉬테이블의 크기가 PGA 영역에 설정한 메모리 사이즈(hash_area_size)보다 커질경우 디스크의 임시영역에 저장하여 성능 저하 발생
 * hash_area_size 를 지나치게 크게 할 경우, 메모리의 지나친 사용으로 오버헤드 발생, 다른 프로세스에게 악영향
 * 선행 테이블의 조인키 킬럼값에 중복값이 많을경우, Probing phase 의 효율성 떨어짐  
 
@@ -116,3 +115,4 @@
 > * https://hoon93.tistory.com/46
 > * https://needjarvis.tistory.com/162
 > * https://hoing.io/archives/14457
+> * http://wiki.gurubee.net/pages/viewpage.action?pageId=26740416
