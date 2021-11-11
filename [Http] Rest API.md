@@ -16,7 +16,9 @@
 
 ### Rest API 특징
 * Uniform (균일한 인터페이스)
-	* 동일한 리소스에 대한 요청은 항상 동일한 응답을 보장해야함
+	* Resource(URI)에 대한 요청을 통일되고, 한정적으로 수행
+	* 4가지의 한정된 인터페이스(Get,Post,Put,Delete)로 자원(URI)에 대한 작업 요청
+	* 4가지 인터페이스를 통해 클라이언트는 구동 플랫폼(os)이나 기술에 종속받지 않고 rest api 요청 가능
 * Stateless(무상태)
 	* 작업을 위한 별도의 상태정보(세션, 쿠키등)를 따로 저장하지 않음
 	* 각각의 요청을 완전히 별개의 것으로 인식, 이전 요청이 다음 요청의 처리에 영향 x
@@ -104,6 +106,7 @@ GET /cars/gasolin/manufacturers/hyundai	//이름이 hyundai 인 가솔린 자동
 ***
 
 > Reference <br>
-> https://meetup.toast.com/posts/92 <br>
-> https://www.a-mean-blog.com/ko/blog/%ED%86%A0%EB%A7%89%EA%B8%80/_/REST%EC%99%80-RESTful-API <br>
-> https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html <br>
+> * https://meetup.toast.com/posts/92
+> * https://www.a-mean-blog.com/ko/blog/%ED%86%A0%EB%A7%89%EA%B8%80/_/REST%EC%99%80-RESTful-API
+> * https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html
+> * https://programmer7895.tistory.com/28
