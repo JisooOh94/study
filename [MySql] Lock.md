@@ -71,3 +71,4 @@
 > * https://kukuta.tistory.com/215
 > * https://cecil1018.wordpress.com/2016/06/18/mysql-innodb-locks/
 > * https://singun.github.io/2019/03/10/mysql-innodb-locking/
+> * 8http://tutorials.jenkov.com/java-concurrency/starvation-and-fairness.html
