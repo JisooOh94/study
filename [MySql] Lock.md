@@ -25,11 +25,12 @@
 ### Gap Lock
 * 인덱스 레코드 자체가 아닌, 레코드 사이의 Gap에 거는 Lock
 * 트랜잭션 처리중, 다른 트랜잭션에 의해 Gap 에 새로운 레코드가 추가되어 트랜잭션내 동일 select 쿼리의 결과가 달라지는 phantom read 현상 방지 
-* Locking select + range scan 일경우에만 Gap Lock 사용(유니크 인덱스를 통한 단일 레코드 select 일 경우 Gap Lock X, Record Lock 만 사용)
+* Locking select/update/delete 쿼리가 range scan 일경우에만 Gap Lock 사용(유니크 인덱스를 통한 단일 레코드 select 일 경우 Gap Lock X, Record Lock 만 사용)
 
 ### Next-Key Lock
 * Record Lock + Gap Lock
-* Locking select + range scan 시 사용(scan되는 레코드에 Record Lock, 그 사이의 Gap 들에 Gap Lock 설정)
+* Locking select/update/delete 쿼리에서 사용(scan되는 레코드에 Record Lock, 그 사이의 Gap 들에 Gap Lock 설정)
+	> 단일 레코드 scan 일 경우, gap lock 은 걸지 않음
 
 ### Insert Intention Lock
 * Insert 쿼리 수행시 사용되는 Gap Lock
