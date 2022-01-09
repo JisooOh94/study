@@ -181,6 +181,49 @@ public synchronized V get(Object key) {
 * thread-safe 하지 않음
 * 시간복잡도 : 조회 O(log n), 추가 O(log n)
 
+<br>
+
+# 동기화 Collection
+### Synchronized Collection
+* Thread-safe 하지만, synchronized 함수를 사용하여 동시 접근이 불가능해 성능이 떨어짐
+```
+//SynchronizedMap.class
+public V get(Object key) {
+    synchronized (mutex) {return m.get(key);}
+}
+public V put(K key, V value) {
+    synchronized (mutex) {return m.put(key, value);}
+}
+```
+
+* Collections.synchronizedXXX(Collection c) 를 통해 생성
+```
+List<String> list = Collections.synchronizedList(new ArrayList<String>());
+```
+* synchronizedList, synchronizedMap, synchronizedSet 제공
+
+### Concurrent Collection
+* Thread-safe 하면서, synchronized 블록을 사용하여 병렬적으로 작업 수행이 가능해, 성능 저하도 적음
+```java
+//ConcurrentMap.class
+final V putVal(K key, V value, boolean onlyIfAbsent) {
+    if (key == null || value == null) throw new NullPointerException();
+    int hash = spread(key.hashCode());
+    int binCount = 0;
+    for (Node<K,V>[] tab = table;;) {
+    	...
+        if (tab == null || (n = tab.length) == 0) ...
+        else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            if (casTabAt(tab, i, null, new Node<K,V>(hash, key, value, null))) ...
+        }
+        else if ((fh = f.hash) == MOVED) ...
+        else {
+            synchronized (f) {
+                ...
+}
+```
+* ConcurrentHashMap, ConcurrentLinkedQueue 제공
+
 ***
 > Reference
 > * https://bangu4.tistory.com/205?category=1003336
