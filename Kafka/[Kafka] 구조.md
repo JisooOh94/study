@@ -7,7 +7,7 @@
 	* Broker 에 메시지가 저장되어있으면, Consumer 가 메시지 읽어 처리
 
 ### zookeeper
-* 연결되어있는 kafka 클러스터, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보등 저장 관리 
+* 연결되어있는 kafka 클러스터, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보 저장 관리 
 * 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
 * zookeeper 도 여러대의 서버를 묶은 클러스토 관리되며, 하나의 zookeeper 클러스터가 여러개의 kafka cluster 관리 가능
 	* 각 kafka cluster 의 메타정보를 저장하는 디렉토리만 구분해주면 됨
@@ -16,6 +16,10 @@
 * 카프카 서버, 메세지 큐 저장 및 관리 수행
 * 확장성 및 고가용성을 위해 여러개의 broker 를 묶은 Kafka cluster 로 관리됨
 * Producer 에서 메시지 전송시, round-robin 방식으로 클러스터내의 broker 들에게 공평하게 할당
+* Kafka cluster 의 브로커들중 하나를 컨트롤러 브로커로 선정하여 클러스터 내 브로커 관리 수행
+	* 브로커 상태 체크
+	* 브로커 사망시, 브로커의 파티션을 리더 파티션으로 사용하던 토픽의 리더 파티션 재 선출
+	* 각 브로커에 파티션 분배
 
 ### topic
 * 메시지 구분을 위한 타이틀 개념
@@ -47,8 +51,6 @@
 	* consumer 는 파티션에서 메세지 consume 하여 처리 후, zookeeper 에 offset 값을 증가시켜 저장하는 offset commit 수행
 	
 ![image](https://user-images.githubusercontent.com/48702893/149145169-80291447-9b7e-45e0-a62a-b46fdd111892.png)	
-
-![image](https://user-images.githubusercontent.com/48702893/148679230-bd963a9a-4381-431f-86fa-d5cc01e89b49.png)
 
 ***
 > Reference
