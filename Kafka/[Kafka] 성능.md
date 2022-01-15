@@ -17,9 +17,9 @@
 	* 컨슈머의 처리속도가 느리거나, 갑자기 많은 양의 메시지가 프로듀스된다면, 브로커 서버에 OOM 에러 발생 가능
 * 컨슈머의 장비 성능이 떨어지거나, 순간적인 부하 증가로 처리 속도가 느려질때, 브로커측에 컨슈머의 부하가 전파되지 않고, 컨슈머도 자신이 처리 가능한 속도로 컨슈밍 가능
 * 컨슈머에서 컨슘한 메시지 처리과정중에 에러가 발생했을떄, 세그먼트 파일을 통해 다시 메시지 조회 가능
-* 세그먼트 파일은 설정된 보존 기간동안 보존후, 자동 삭제됨 
+* 세그먼트 파일은 설정된 보존 기간동안 보존후, 자동 삭제됨
 
-![image](https://user-images.githubusercontent.com/48702893/149331939-9259ea2e-18b9-41c8-a8c2-3aa6140a076d.png)
+<img src="https://user-images.githubusercontent.com/48702893/149331939-9259ea2e-18b9-41c8-a8c2-3aa6140a076d.png" width="400" height="200"> 
 
 <br>
 
@@ -40,9 +40,8 @@
 * 컨텍스트 스위칭 없이 커널 영역에서만 작업이 수행되므로, 커널 모드 - 유저모드 전환이 없어 성능 향상 
 	> 메시지 암호화(SSL) 설정시, 메시지 암복호화를 위해 유저 모드 전환이 필요하므로 제로 카피 사용 불가능
 
-![image](https://user-images.githubusercontent.com/48702893/149332010-e7f9be01-1170-475f-b180-702ee1cc0769.png)
-
-![image](https://user-images.githubusercontent.com/48702893/149332024-ffaf5374-58d1-4d43-b559-1a3b9d667a69.png)
+<img src="https://user-images.githubusercontent.com/48702893/149332010-e7f9be01-1170-475f-b180-702ee1cc0769.png" width="400" height="350">
+<img src="https://user-images.githubusercontent.com/48702893/149332024-ffaf5374-58d1-4d43-b559-1a3b9d667a69.png" width="400" height="350">
 
 ### 메시지 배치 처리
 * 메시지를 디스크에 저장하므로, 메시지를 버퍼링했다가 한번에 컨슘하여 처리하는 배치 처리 가능
