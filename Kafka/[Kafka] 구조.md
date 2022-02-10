@@ -11,6 +11,24 @@
 * 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
 * zookeeper 도 여러대의 서버를 묶은 클러스토 관리되며, 하나의 zookeeper 클러스터가 여러개의 kafka cluster 관리 가능
 	* 각 kafka cluster 의 메타정보를 저장하는 디렉토리만 구분해주면 됨
+	
+### producer
+* 크게 Accumulator, Sender로 구성
+* Accumulator
+	* 전송 요청되는 메시지들을 모아두는 버퍼, 저장공간
+	* buffer.memory(default : 32mb) 설정값으로 accumulator 크기 설정 가능
+	* accumulator 에 메시지를 축적해두었다가, 전송이 trigger 되면, sender 에서 batch.size(default: 16kb) 만큼 메시지를 bulk 로 읽어가 토픽으로 전송
+		* 네트워크 트래픽 비용 감소 및, 브로커 서버 부하 감소
+	* sender 에서 메시지 전송하는 속도보다, accumulator 에 축적되는 속도가 더 빨라 버퍼가 가득찰시, accumulator 는 신규 메시지 전송 요청을 max.block.ms(default: 60000) 값 만큼 block하게되며, 그 시간 이후에도 버퍼에 여유공간이 생기지 않는다면 예외 throw
+	* 버퍼 full 로 인한 메시지 전송 요청 실패가 빈번히 발생한다면, accumulator 의 버퍼크기(buffer.memory) 증대 필요
+* Sender
+	* 브로커에 메시지를 전송하는 백그라운드 스레드
+	* Accumulator 에 batch.size 만큼 메시지가 쌓여있으면 브로커로 전송
+	* 쌓여있는 메시지 크기가 batch.size 보다 작아도 마지막 메시지 전송 이후 linger.ms(default 0) 만큼의 시간이 지나면 브로커로 전송
+	* 브로커로 메시지 전송 실패시(브로커로부터 ack 응답 미수신) retries 로 설정한 횟수만큼 메시지 재전송 시도
+	* retries 와는 별도로, 최초 메시지 전송 시도 이후 delivery.timeout.ms 까지 전송 성공하지 못할시, 재전송 중단 및 예외 throw 
+
+![image](https://user-images.githubusercontent.com/48702893/153410414-f6ceec63-e151-4da7-b8ce-9bda37657bf0.png)
 
 ### broker
 * 카프카 서버, 메세지 큐 저장 및 관리 수행
@@ -34,6 +52,7 @@
 * producer 가 메시지 전송시, 메시지는 해당 토픽의 파티션들에 round-robin 방식으로 골고루 저장되게 되며, 이를 통해 broker 에도 부하가 골고루 분산되게됨
 * 하나의 파티션 내의 메시지간에는 LIFO 를 보장하나, 여러 파티션간 메시지는 LIFO 를 보장하지 않음
 	* 메시지가 프로듀스 된 시간 순서에따라 처리가 되어야한다면, 토픽의 메시지를 하나의 파티션에만 프로듀싱하도록 파티션 고정 가능
+* 토픽의 파티션 추가는 런타임시점에도 자유롭게 가능하나, 파티션 제외는 불가능(토픽 삭제 후 재생성으로만 가능)
 
 ![image](https://user-images.githubusercontent.com/48702893/149141998-24c29f47-c66d-4534-810c-3aae65f65cae.png)
 
@@ -46,9 +65,13 @@
 	* partition 수보다 consumer 수가 더 많을경우, 아무런 partition 도 할당받지 못한 잉여 consumer 가 발생하므로, topic 의 partition 수에 따라 consumer group 내 consumer 수 조절이 중요
 * consumer group 이 처리할 topic 설정시, topic 의 파티션들을 consumer group 내 consumer 들에게 할당하는 리밸런싱 과정 수행됨
 	* consumer group 에 consumer 가 추가되거나 삭제될시, 리밸런싱 재수행
-* consumer group 은 각 consumer 가 할당된 파티션에서 마지막으로 컨슈밍한 offset 정보를 zookeeper 로부터 할당받아 저장 및 관리
-	* 한 consumer 에 장애가 발생해 consumer group에서 이탈할시, 그 consumer 가 담당하던 파티션들의 last offset 정보를 가져와 다른 consumer 가 이어서 처리 가능
+* consumer group 의 각 consumer 는 파티션에서 마지막으로 컨슈밍한 offset 정보를 저장 및 관리
+	* 0.9 이전버전은 zookeeper, 이후 버전은 별도의 토픽(_consumer_offsets)에 저장
 	* consumer 는 파티션에서 메세지 consume 하여 처리 후, zookeeper 에 offset 값을 증가시켜 저장하는 offset commit 수행
+	* 한 consumer 에 장애가 발생해 consumer group에서 이탈할시, 그 consumer 가 담당하던 파티션들의 가장 최근에 commit 된 offset 정보를 가져와 다른 consumer 가 이어서 처리 가능
+	* commit 된 offset 이 이전 consumer 가 실제 마지막으로 처리한 offset 보다 
+		* 작을경우 : 메시지 중복으로 처리 됨
+    	* 클경우 : 처리된 offset과 commit 된 offset 사이의 모든 메시지 누락      
 	
 ![image](https://user-images.githubusercontent.com/48702893/149145169-80291447-9b7e-45e0-a62a-b46fdd111892.png)	
 
@@ -58,3 +81,4 @@
 > * https://yeon-kr.tistory.com/183
 > * https://needjarvis.tistory.com/603
 > * https://always-kimkim.tistory.com/entry/kafka101-broker
+> * https://allg.tistory.com/66?category=692384
