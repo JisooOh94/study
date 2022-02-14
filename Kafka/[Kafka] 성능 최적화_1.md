@@ -13,23 +13,32 @@
 * batch.size 
 	* 브로커로 묶어서 전송할 메시지 bulk 크기
 	* 네트워크 트래픽 및 브로커 부하 감소
+	* default : 16384 byte
 * linger.ms
 	* 마지막 메시지 전송 이후 다음 메시지 전송 trigger 시간 
 	* linger.ms 시간 이전에 Accumulator 버퍼에 batch.size 만큼 메시지가 축적시 linger.ms 무시하고 바로 전송
-* compression.type : 메시지 압축 포맷 설정. none, gzip, snappy 등
+	* default : 0
+* compression.type
+	* 메시지 압축 포맷 설정. none, gzip, snappy 등
+	* default : none
 * acks : 메시지 전송 성공 판단 기준
-	* acks=0
+	* default : 1
+	* 0
 		* 브로커의 ack 응답 여부 상관 없이, 전송 즉시 성공으로 판단
 		* 높은 처리량을 얻을 수 있으나, 메시지 유실이 많아짐
-	* acks=1
+	* 1
 		* 리더 파티션에 메시지 저장 성공시 성공으로 판단. 리더 파티션은 팔로워 파티션들의 메시지 저장 성공 여부 상관없이 ACK 응답 전송
 		* 처리량과 내구성 사이의 적절한 타협
-	* acks=all / ack=-1
+	* all / -1
 		* 리더 파티션 및 팔로워 파티션(ISR) 모두에 메시지 저장 성공시 성공으로 판단. 리더 파티션은 팔로워 파티션으로부터 ack 응답 수신 후 ack 응답 전송
 		* 높은 내구성 보장하나 처리량이 떨어짐 
-* retries : 메시지 전송 실패시, 재시도 횟수
+* retries
+	* 메시지 전송 실패시, 재시도 횟수
+	* default : 0
 * max.in.flight.requests.per.connection : 한번에 전송할 메시지 bulk 개수. 2개 이상일 경우, 메시지 전송 순서 바뀔수있음 
-* buffer.memory : Accumulator 버퍼 크기
+* buffer.memory
+	* Accumulator 버퍼 크기
+	* 33554432 byte
 
 ### Broker
 * num.replica.fetchers : 리더 파티션의 메시지를 팔로워 파티션으로 전송하는 백그라운드 스레드 개수
@@ -51,10 +60,12 @@
 	* 브로커로부터 한번에 가져올 메시지 bulk 크기
 	* Producer 의 batch.size 와 동일
 	* 네트워크 트래픽 및 브로커 부하 감소
+	* default : 1 byte
 * fetch.max.wait.ms
 	* 마지막 메시지 컨슈밍 이후 다음 메시지 컨슈밍 trigger 시간 
 	* fetch.max.wait.ms 시간 이전에 파티션에 fetch.min.bytes 만큼 메시지 축적시 fetch.max.wait.ms 무시하고 바로 컨슈밍
-	* Producer 의 linger.ms 와 동일 
+	* Producer 의 linger.ms 와 동일
+	* default : 500ms 
 * auto.commit.enable
 	* 파티션에 오프셋 정보가 없는경우(에러로 인한 유실 or 처음 생성된 파티션 등) 처리 방법
 	* earliest : 최초의 오프셋 값으로 설정
