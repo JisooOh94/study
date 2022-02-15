@@ -45,4 +45,46 @@
 ### Consumer
 * fetch.min.bytes 작게
 	* 작게 설정할 수록, 메시지를 프로듀싱 되는대로 바로 컨슈밍하므로 대기로 인한 지연 없음
- 
+
+<br>
+
+# Durability
+### Producer
+* acks = all 로 설정
+	* 모든 replica 에 복제 성공을 보장하므로 메시지 유실 방지
+* min.insync.replicas 크게
+	* 메시지 복제본 수가 많아지므로 메시지 유실률 저하 
+* retries 횟수 많이
+	* 메시지 실패에 따른 메시지 유실 방지
+* max.in.flight.requests.per.connection 1로 설정
+	* 한번에 하나의 메시지만 전송
+
+### Broker
+* replication.factor 높게
+	* 메시지 복제본이 많아질수록, 메시지 유실 저하 
+* default.replication.factor false 로 설정
+	* replication.factor 파라미터를 지정하지 않았을 경우, 자동으로 설정되는 replication.factor
+	* 운영상의 안정성을 위해 false 설정을 권장 
+* broker.rack 활성화
+	* 하나의 rack에 장애가 발생해도 다른 rack 의 브로커가 있으므로 fault tolerant 향상 but 메시지 복제시 네트워크 트래픽 비용 증가 
+* unclean.leader.election.enable 비활성화
+	* ISR 만 리더 파티션 되게 함으로서 메시지 유실 방지
+* log.flush.interval.ms / log.flush.interval.messages 작게 설정
+	* 빈번하게 메시지를 디스크에 저장함으로서 유실 방지
+
+### Consumer
+* enable.auto.commit 비활성화
+	* 활성화시, 메시지 중복처리 버그 발생 가능[참고](https://blog.voidmainvoid.net/262)
+
+<br>
+
+# Availability
+### Broker
+* unclean.leader.election.enable 활성화
+	* 가용한 ISR 파티션이 없을때, 장애상황에 빠지는것이 아닌 OSR 파티션을 리더로 대신 선출하여 동작
+* num.recovery.threads.per.data.dir 많이
+	* 브로커 구동시 로그 파일 스캔을 여러 스레드가 병렬로 수행하므로 구동속도가 빨라지고 장애 복구 시간이 단축됨
+
+### Consumer
+* session.timeout.ms 짧게 설정
+	* 컨슈머의 장애를 브로커가 빠르게 감지하여 장애 처리 수행
