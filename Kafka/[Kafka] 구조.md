@@ -60,6 +60,8 @@
 * 파티션에 저장되어있는 메시지를 소비해가 처리를 수행하는 주체
 * consumer 또한 마찬가지로 여러개의 consumer 를 묶은 consumer group 으로 관리되며, 토픽은 consumer group 단위로 구독됨
 	* 하나의 토픽을 여러개의 consumer group 이 구독 가능
+		* 하나의 메시지 데이터를 여러 용도로 사용하고자 하는 요구사항 충족
+		* 각 consumer group이 개별적으로 파티션의 offset 을 관리함으로서 가능
 * 토픽내의 파티션과 consumer group 내 consumer 는 1:1, N:1 의 관계는 가능하나, 1:N 의 관계는 불가능
 	* 하나의 파티션을 여러개의 consumer 가 소비해가는경우, LIFO 이 깨질수 있고 last offset 관리가 어려워짐
 	* partition 수보다 consumer 수가 더 많을경우, 아무런 partition 도 할당받지 못한 잉여 consumer 가 발생하므로, topic 의 partition 수에 따라 consumer group 내 consumer 수 조절이 중요
