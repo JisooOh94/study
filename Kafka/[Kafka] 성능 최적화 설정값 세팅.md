@@ -88,3 +88,8 @@
 ### Consumer
 * session.timeout.ms 짧게 설정
 	* 컨슈머의 장애를 브로커가 빠르게 감지하여 장애 처리 수행
+	
+***
+> Reference
+> * https://firststep-de.tistory.com/43
+> * https://ohjongsung.io/2020/01/04/%EC%B9%B4%ED%94%84%EC%B9%B4-%ED%8A%9C%EB%8B%9D-%EB%B0%A9%EC%95%88-%EC%A0%95%EB%A6%AC
