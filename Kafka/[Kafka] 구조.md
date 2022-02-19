@@ -5,6 +5,10 @@
 * Producer - Broker - Consumer 로 구성
 	* Producer 에서 메시지 생성하여 Broker 로 전송
 	* Broker 에 메시지가 저장되어있으면, Consumer 가 메시지 읽어 처리
+* pub-sub 구조 메시지 큐
+	* publisher 가 메시지 발행시, 그를 구독한 subscriber 가 메시지 소비(정해진 subscriber 에게 메시지를 전송 X)
+	* publisher 는 subscriber 에 대한 정보 없이 메시지만 발행하고, subscriber 도 publisher에 대한 정보 없이 메시지 소비 가능
+	* 발행자와 구독자의 디커플링을 통해 가용성 및 확장성 증대 
 
 ### zookeeper
 * 연결되어있는 kafka 클러스터, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보 저장 관리 
