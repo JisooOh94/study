@@ -105,3 +105,7 @@ public record SampleRecord(
 ```java
 SampleRecord sampleRecord = new SampleRecord("foo", 29, "Seoul");
 ```
+* Record 에 Serializable 을 implements시, 직렬화/역직렬화 하여 사용 가능하며, 이떄 내부적으로 자동으로 생성된 AllArgsConstructor 및, getter 를 사용하여 역직렬화/직렬화 수행 [[docs]](https://docs.oracle.com/en/java/javase/15/serializable-records/index.html)
+* jackson 라이브러리를 통한 json 직렬화/역직렬화는 jackson 2.12 + 부터 지원 [[Jackson-Release-2.12]](https://github.com/FasterXML/jackson/wiki/Jackson-Release-2.12)
+    > Annotation scope 이 class 또는 field 인 jackson annotation 들(e.g. @JsonProperty, JsonInclude 등) 은 그대로 사용이 가능하나, scope 이 method 인 annotation 은 조사 필요(@JsonSetter, @JsonAnyGetter 등)
+    > jackson 2.12 이하 버전에서도 편법을 통해 사용은 가능 [[ref]](https://dev.to/brunooliveira/practical-java-16-using-jackson-to-serialize-records-4og4)
