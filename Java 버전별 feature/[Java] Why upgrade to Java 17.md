@@ -37,5 +37,4 @@
 ***
 
 > Reference
-> https://wiki.linecorp.com/display/EC/Upgrade+to+Java+17
-> https://docs.oracle.com/en/java/javase/17/migrate/migrating-jdk-8-later-jdk-releases.html#GUID-7744EF96-5899-4FB2-B34E-86D49B2E89B6
+> * https://docs.oracle.com/en/java/javase/17/migrate/migrating-jdk-8-later-jdk-releases.html#GUID-7744EF96-5899-4FB2-B34E-86D49B2E89B6
