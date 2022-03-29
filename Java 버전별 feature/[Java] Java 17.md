@@ -65,5 +65,65 @@ generator = RandomGenerator.of("SecureRandom");
 public sealed interface CarBrand permits Hyundai, Kia{ ... }
 ```
 
+#### Sealed Classes motivation [[ref]](https://luvstudy.tistory.com/125) [[ref]](https://xperti.io/blogs/sealed-classes-java-feature/)
+* java 에서 class 계층구조의 목적은 일반적으로 상속을 통한 코드 재사용
+* 그러나 때떄로 그래픽 라이브러리에서 지원하는 shape의 종류, 금융 프로그램에서 지원하는 대출 종류와 같이 특정 domain에 존재하는 구성요소 종류를 모델링하기 위해 계층구조 사용하기도 함 (일종의 Enum 과 비슷한 느낌)
+```java
+public interface Quadrangle { ... }
+public class Square implements quadrangle { ... }
+public class Rectangle implements quadrangle { ... }
+public class Parallelogram implements quadrangle { ... }
+public class Rhombus implements quadrangle { ... }
+```
+
+* 구성요소 종류 표현을 위해 class 계층 구조를 사용하는 경우, 타 개발자의 무분별한 상속으로 인한 버그를 막기위해, 상속 제한 필요
+  * 상속 제한이 없는경우, 해당 class 를 사용하는 모든곳에서 알 수 없는 Subclass 에 대한 방어로직 필요
+  ```java
+  int getCenter(Shape shape) { 
+      if (shape instanceof Circle) { 
+          return ... ((Circle)shape).center() ... 
+      } else if (shape instanceof Rectangle) { 
+          return ... ((Rectangle)shape).length() ... 
+      } else if (shape instanceof Square) { 
+          return ... ((Square)shape).side() ... 
+      } else {
+          //defense logic for anonymous subclass
+      } 
+  }
+  ```
+* 기존의 상속 제한 방식은 주로 다음과 같았으나, 모두 Subclass 집합을 제한하는 구조에는 적합하지 않음
+  1. private constructor
+  2. final class
+  3. package private class
+* 이러한 상황에서, Subclass 집합 제한을 간단하게 할 수 있는 Sealed Class 를 지원함으로서, 클래스 계층 구조 간소화 
+
+#### Saaled Class Use Case
+* subclass에 대해 추론하는 전통적인 방법은 if-else 구문으로 instanceof를 연달아 사용하는 방법이었으나, 이 경우, 모든 SubClass 에 대한 조건 처리가 되었는지 알기도 어려울뿐더러 코드 가독성도 떨어짐
+  * 아래 케이스의 경우, Rectangle 에 대한 else if block 이 누락되어도 컴파일타임에서 알 수 없음, SubClass 개수가 많아질 수록, 코드상으로 알아채기에도 어려워짐
+```java
+int getCenter(Shape shape) { 
+    if (shape instanceof Circle) { 
+        return ... ((Circle)shape).center() ... 
+    } else if (shape instanceof Rectangle) { 
+        return ... ((Rectangle)shape).length() ... 
+    } else if (shape instanceof Square) { 
+        return ... ((Square)shape).side() ... }
+    else {
+        //defense logic for anonymous subclass
+    }
+}
+```
+* Sealed Class 의 경우 if-else + instanceof 를 이용하는 대신, advanced switch-case 문을 통해 간결하게 표현 가능 및 Complier 의 지원을 받을 수 있음
+  * 아래 케이스의 경우, Sealed class 의 permit 으로 명시된 subclass case 중 누락이 존재하면 Complie error 출력
+  * 또한, anonymous subclass 에 대한 방어로직(default 절) 불필요
+```java
+int getCenter(Shape shape) { 
+    return switch (shape) { 
+        case Circle c -> ... c.center() ... 
+        case Rectangle r -> ... r.length() ... 
+        case Square s -> ... s.side() ... }; 
+}
+```
+
 ### Context-Specific Deserialization Filters [[JEP 415]](https://openjdk.java.net/jeps/415)
 * Java 9 에 추가된, 역직렬화 허용/차단 클래스 필터의 사용성 개선
