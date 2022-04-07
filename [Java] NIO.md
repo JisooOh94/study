@@ -163,13 +163,14 @@ public abstract MappedByteBuffer map(MapMode mode, long position, long size) thr
 
 ***
 > Reference <br>
-> * https://jess-m.tistory.com/23 <br>
-> * https://coding-start.tistory.com/318 <br>
-> * https://brunch.co.kr/@myner/50
-> * https://velog.io/@maketheworldwise/IO%EA%B0%80-%EB%8A%90%EB%A6%B0-%EC%9D%B4%EC%9C%A0%EA%B0%80-%EB%AD%98%EA%B9%8C-NIO%EB%8A%94-%EB%AD%98%EA%B9%8C
-> * https://homoefficio.github.io/2016/08/06/Java-NIO%EB%8A%94-%EC%83%9D%EA%B0%81%EB%A7%8C%ED%81%BC-non-blocking-%ED%95%98%EC%A7%80-%EC%95%8A%EB%8B%A4/#about
-> * https://hbase.tistory.com/37
-> * https://aibees.github.io/Java-NIO/
-> * https://hamait.tistory.com/421
-> * https://jongmin92.github.io/2019/02/28/Java/java-with-non-blocking-io/
-> * https://jongmin92.github.io/2019/03/03/Java/java-nio/
+* https://jess-m.tistory.com/23 <br>
+* https://coding-start.tistory.com/318 <br>
+* https://brunch.co.kr/@myner/50
+* https://velog.io/@maketheworldwise/IO%EA%B0%80-%EB%8A%90%EB%A6%B0-%EC%9D%B4%EC%9C%A0%EA%B0%80-%EB%AD%98%EA%B9%8C-NIO%EB%8A%94-%EB%AD%98%EA%B9%8C
+* https://homoefficio.github.io/2016/08/06/Java-NIO%EB%8A%94-%EC%83%9D%EA%B0%81%EB%A7%8C%ED%81%BC-non-blocking-%ED%95%98%EC%A7%80-%EC%95%8A%EB%8B%A4/#about
+* https://hbase.tistory.com/37
+* https://aibees.github.io/Java-NIO/
+* https://hamait.tistory.com/421
+* https://jongmin92.github.io/2019/02/28/Java/java-with-non-blocking-io/
+* https://jongmin92.github.io/2019/03/03/Java/java-nio/
+* https://free-strings.blogspot.com/2016/04/zero-copy.html
