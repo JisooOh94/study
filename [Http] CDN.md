@@ -67,3 +67,4 @@
 * https://www.alibabacloud.com/ko/knowledge/what-is-cdn
 * http://www.cctvnews.co.kr/news/articleView.html?idxno=68007
 * http://www.realmobile.net/products/product_main08_02.asp
+* https://www.dacast.com/blog/aws-vs-akamai-cdn-service-for-live-video-streaming/
