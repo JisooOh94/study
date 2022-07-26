@@ -42,7 +42,7 @@
 ```xml
 <servlet-maaping>
 	<servlet-name>foo</servlet-name>>
-	<url-pattern>*.nhn</url-pattern>
+	<url-pattern>*.com</url-pattern>
 </servlet-maaping>
 ```
 ```
