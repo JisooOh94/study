@@ -1,17 +1,48 @@
-# 성능 지표 명령어
-# top
+# Overall
+
+## top
 * 리눅스 시스템의 전반적인 상황을 모니터링
 
 ![image](https://user-images.githubusercontent.com/48702893/164175176-47972c5a-8e1e-4b9b-a641-9edbce3fa8bc.png)
- 
+
+### Total
 ```shell
-$ top
-top - 00:15:40 up 7 days, 21:56,  1 user,  load average: 31.09, 29.87, 29.92
+top - 00:15:40 up 7 days, 21:56,  1 user,  load average: 0.09 0.04 0.01
 Tasks: 871 total,   1 running, 868 sleeping,   0 stopped,   2 zombie
 %Cpu(s): 96.8 us,  0.4 sy,  0.0 ni,  2.7 id,  0.1 wa,  0.0 hi,  0.0 si,  0.0 st
 KiB Mem:  25190241+total, 24921688 used, 22698073+free,    60448 buffers
 KiB Swap:        0 total,        0 used,        0 free.   554208 cached
+```
+* top : 현재 서버의 시간 및 서버가 구동된 이후 경과 시간 (7일 21시간 56분 경과)
+* user : 접속해있는 사용자 수
+* load average : 1분, 5분, 15분 간의 평균 CPU 사용률
+  * 1.0 이 100% CPU 사용중이라는 의미이며, 멀티코어일경우, 1.0 * 코어수 가 전체 CPU 가용량 (e.g. 4코어 일경우 4.0 이 모든 CPU 를 100% 사용하고있다는 의미)
+  * load average 가 최대 CPU 가용량(1.0 * 코어수) 보다 큰경우, 실행되지 못하고 대기중인 프로세스가 존재
+  * 1분 평균 CPU 사용률이 15분 평균 값보다 크다면, 부하가 진행중
+* Task : 전체 가동 중인 프로세스 개수
+  * running : 실행중인 프로세스
+  * sleeping : 대기중인 프로세스
+  * stopped : 종료된 프레세스
+  * zombie : 좀비상태인 프로세스 (부모 프로세스가 종료된 자식 프로세스)
+* CPU (%)_
+  * us : 유저 모드에서 사용되는 cpu 비중
+  * sy : 커널 모드에서 사용되는 cpu 비중
+    * 커널 모드 부하가 높은경우, strace 를 통해 애플리케이션의 systemcall 호출 분석, 어플리케이션을 수정하거나 커널 파라미터 튜닝을 통해 부하 완화
+  * id : 유휴상태의 cpu 비중
+  * wa : I/O 요청 후 blocking 되어 응답을 기다리는 cpu 비중
+    * iowait가 높은 경우, iostat 명령어를 통해 디스크 I/O 상황 분석
+  * hi : 하드웨어 인터럽트에 사용되는 cpu 비중
+  * si : 소프트웨어 인터럽트에 사용되는 cpu 비중
+  * st : cpu 를 vm 에서 사용하여 대기하는 cpu 비중, 가상 CPU를 서비스 하는 동안 실제 CPU를 차지한 시간
+* KiB Mem, KiB Swap : 물리 메로리 / 스왑공간 정보
+  * total : 전체 물리/스왑 메모리
+  * free : 사용되지 않은 여유 메모리
+  * used : 사용중인 메모리
+  * buffers : I/O 작업에 사용되는 커널 버퍼로 쓰는 메모리
+  * cached : disk의 페이지 캐시에 사용되는 메모리
 
+### Process
+```shell
    PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
  20248 root      20   0  0.227t 0.012t  18748 S  3090  5.2  29812:58 java
   4213 root      20   0 2722544  64640  44232 S  23.5  0.0 233:35.37 mesos-slave
@@ -25,58 +56,25 @@ KiB Swap:        0 total,        0 used,        0 free.   554208 cached
      6 root      20   0       0      0      0 S   0.0  0.0   0:06.94 kworker/u256:0
      8 root      20   0       0      0      0 S   0.0  0.0   2:38.05 rcu_sched
 ```
-
-### Columns
-* top : 현재 서버의 시간 및 서버가 구동된 이후 경과 시간 (7일 21시간 56분 경과)
-* user : 접속해있는 사용자 수
-* load average
-  * 부하율. 1분, 5분, 15분 간의 평균 CPU 사용률
-  * 1.0 이 100% CPU 를 사용중이라는 의미이며, 멀티코어일경우, 1.0 * 코어수 가 전체 CPU 가용량 (e.g. 4코어 일경우 4.0 이 모든 CPU 를 100% 사용하고있다는 의미)
-  * load average 가 최대 CPU 가용량(1.0 * 코어수) 보다 큰경우, 실행되지 못하고 대기중인 프로세스가 있다는 의미
-  * 1분 평균 CPU 사용률이 15분 평균 값보다 크다면, 부하가 진행중이라는 의미
-* Task : 전체 가동 중인 프로세스 개수
-  * running : 실행중인 프로세스
-  * sleeping : 대기중인 프로세스
-  * stopped : 종료된 프레세스
-  * zombie : 좀비상태인 프로세스 (부모 프로세스가 종료된 자식 프로세스)
-* CPU
-    * us : 유저 모드에서 사용되는 cpu 비중 (%)
-    * sy
-      * 커널 모드에서 사용되는 cpu 비중 (%)
-      * 커널 모드 부하가 높은경우, strace 를 통해 애플리케이션의 systemcall 호출 분석, 어플리케이션을 수정하거나 커널 파라미터 튜닝을 통해 부하 완화
-    * id : 유휴상태의 cpu 비중 (%)
-    * wa
-        * I/O 요청 후 blocking 되어 응답을 기다리는 cpu 비중
-        * iowait가 높은 경우, iostat 명령어를 통해 디스크 I/O 상황 분석
-    * hi : 하드웨어 인터럽트에 사용되는 cpu 비중
-    * si : 소프트웨어 인터럽트에 사용되는 cpu 비중
-    * st : cpu 를 vm 에서 사용하여 대기하는 cpu 비중, 가상 CPU를 서비스 하는 동안 실제 CPU를 차지한 시간
-* KiB Mem, KiB Swap
-    * total : 전체 물리 메모리
-    * free : 사용되지 않은 여유 메모리
-    * used : 사용중인 메모리
-    * buffers : I/O 작업에 사용되는 커널 버퍼로 쓰는 메모리
-    * cached : disk의 페이지 캐시에 사용되는 메모리
-* Process  정보
-    * PID : 프로세스 ID
-    * USER : 프로세스를 실행시킨 사용자 ID
-    * PR : 커널에 의해 스케쥴링 되는 우선순위
-    * NI : PR 값 산출 파라미터(NICE 값, 마이너스면 우선순위높은 일)
-    * VIRT : 현재 프로세스가 사용하고 있는 가상 메모리 양으로서 소비하고있는 총 메모리 크기
-    * RES : 현재 프로세스가 사용하고 있는 물리 메모리 양
-    * SHR : 다른 프로세스와 공유하고 있는 공유 메모리 양
-    * S : 프로세스의 상태
-      * S : sleeping (요청한 리소스를 즉시 사용 가능)
-      * R : running (실행 중)
-      * W : swapped out process
-      * Z : zombies (부모 프로세스가 죽은 자식 프로세스)
-      * T : traced or stopped
-      * D : Uninterruptiable sleep (디스크 혹은 네트워크 I/O를 대기) 
-    * %CPU : 프로세스가 사용하는 CPU 사용률
-    * %MEM : 프로세스가 사용하는 메모리 사용률
-    * TIME+ : 프로세스가 사용한 토탈 CPU 시간 
-    * COMMAND : 해당 프로세스를 실행한 커맨드
-
+* PID : 프로세스 ID
+* USER : 프로세스를 실행시킨 사용자 ID
+* PR : 커널에 의해 스케쥴링 되는 우선순위
+* NI : PR 값 산출 파라미터(NICE 값, 마이너스면 우선순위높은 일)
+* VIRT : 사용하고 있는 총 메모리 양(코드, heap & stack, io buffer 등을 포함)
+* RES : 사용하고 있는 물리 메모리 양
+* SHR : 다른 프로세스와 공유하고 있는 공유 메모리 양
+* S : 프로세스의 상태
+  * S : sleeping (요청한 리소스를 즉시 사용 가능)
+  * R : running (실행 중)
+  * W : swapped out process
+  * Z : zombies (부모 프로세스가 죽은 자식 프로세스)
+  * T : traced or stopped
+  * D : Uninterruptiable sleep (디스크 혹은 네트워크 I/O를 대기) 
+* %CPU : CPU 사용률
+* %MEM : 메모리 사용률
+* TIME+ : 사용한 토탈 CPU 시간 
+* COMMAND : 프로세스를 실행한 커맨드 
+M
 ### Options
 * Sorting : 프로세스 리스트를 특정 칼럼값을 기준으로 정렬하여 출력
   * M : 메모리 사용량 (RES)
@@ -90,14 +88,11 @@ KiB Swap:        0 total,        0 used,        0 free.   554208 cached
   * e.g. 메모리 사용률이 3% 이상인 프로세스 필터링
   ![image](https://user-images.githubusercontent.com/48702893/164478085-88099622-f180-4022-a4cd-ded187730d0b.png)
 
-ps 와 top의 차이점
-    * ps는 ps한 시점에 proc에서 검색한 cpu 사용량이다.
-    * top은 proc에서 일정 주기로 합산해서 cpu 사용율을 출력한다.
-
 <br>
 
-# vmstat
-* 프로세스/메모리/입출력/시스템/CPU 활동상황에 대한 정보 확인
+## vmstat
+* 장비의 프로세스,메모리,입출력,CPU 부하등에 대한 요약 정보 확인
+* 보통 vmstat 을 통해, 어느 영역이 문제인지 1차적으로 확인후, 문제 영역에 따라 적절한 다른 모니터링 명령어를 통해 딥다이브
 * vmstat <delay> <count>
   * delay : 결과가 출력되는 주기, 이 값을 지정하지 않으면 한 번만 수행하고 종료
   * count : 데이터를 출력할 횟수. 이 옵션을 지정하지 않으면 계속 수행
@@ -107,7 +102,7 @@ ps 와 top의 차이점
 # vmstat 1 10
 procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
- 1  0      0 2669616 403776 24131636    0    0     0     3    0    0  0  0 100  0  0
+ 1  0      0 2669616 403776 24131636    0    0     0     3    0    0  0  0 100  0  0 >> 평균치값이므로 무시
  0  0      0 2669848 403776 24131636    0    0     0     0  370  411  0  0 100  0  0
  0  0      0 2669816 403776 24131640    0    0     0     0  164  249  0  0 100  0  0
  0  0      0 2669848 403776 24131640    0    0     0     4  437  469  0  0 100  0  0
@@ -126,114 +121,45 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
   * I/O 작업 요청 후, blocking 되어 sleep 상태로 대기중인 프로세스 수
 
 ### memory 관련 Columns(kb)
-* memory 항목에서 주요한 것은 free항목으로 free는 해당 OS의 실제 남은 메모리를 의미한다.
-* free의 수가 현저히 적다면 실제 OS의 물리적인 메모리가 부족하다고 판단하여도 큰 무리가 없다.
+* free 항목을 통해 메모리 부족 여부 파악, 부족하다면 어느 영역에서 메모리 많이 점유중인지 확인
 * swpd : 사용된 가상 메모리 용량
 * free : 여유 메모리 용량
 * buff : 버퍼에 사용된 메모리 용량
 * cache : 페이지 캐시에 사용된 메모리 용량
 
 ### swap 관련 Columns(kb)
+* swap out, swap in 값이 지속적으로 0 이 아닐시, 메모리가 부족하여 disk swap 이 발생하고 있는 상황 
 * si(swap in) : 디스크(swap 영역)에서 메모리로 스왑된 용량
 * so(swap out) : 메모리에서 디스크(swap 영역)로 스왑된 용량
-* 물리 메모리가 부족할경우, swap out, swap in 이 발생하므로 이 값이 지속적으로 0 이 아닐시 현재 시스템에 메모리가 부족한것
 
 ### io 관련 Columns(blocks/s)
+* 실제로 프로세스에서 얼마나 I/O 가 발생중인지 확인 가능
 * bi : device에서 받은 입력 블록 수 
 * bo : device에 쓰기 블록 수
-* 실제로 프로세스에서 얼마나 I/O 가 발생중인지 확인 가능
 
 ### system 관련 Columns
-* 주로 이전일의 값과 비교하여 CPU 사용률 변화 확인
-* in : 초당 발생한 interrupts 수
-* cs : 초당 발생한 context switches 수
+* 주로 이전일의 값과 비교하여 CPU 사용률 변화 확인하여 CPU 부하 확인하는용도로 사용 가능하나 중요한 지표는 아님
+* in : 초당 발생한 interrupts 수, 커널 영역 작업 수행 빈도수로 볼 수 있음
+* cs : 초당 발생한 context switches 수, CPU 자원 경합률아라 볼 수 있음
 
 ### cpu 관련 Columns
-* us가 높은지, sy 가 높은지에 따라 CPU 사용률 원인분석을 위한 명령어가 달라짐
-  * us가 높을경우 : kill -3, ti
-  * sy가 높을경우 : truss
-* us : user 영역 명령 수행 시간
-* sy : kernel 영역 명령 수행 시간
-* id : cpu 가 유휴 상태(idle) 인 시간
+* 유저 영역 부하가 높은지(us), 커널 영역 부하가 높은지(sy) 확인 후, 각 영역에 맞는 다른 명령어를 통해 딥다이브 
+* us : user 영역 명령 수행 시간 (user 영역 명령 수행중인 CPU 비율)
+* sy : kernel 영역 명령 수행 시간 (kernel 영역 명령 수행중인 CPU 비율)
+* id : cpu 가 유휴 상태(idle) 인 시간(사용 가능한 CPU 비율, 일반적으로 100 – (us + sy))
 * wa
-  * I/O 요청 후 blocking 되어 응답을 기다리는 cpu 시간
+  * I/O 요청 후 blocking 되어 응답을 기다리는 cpu 시간 (IO 대기중인 CPU 비율)
 * st
   * stolen time, 가상 CPU를 서비스 하는 동안 실제 CPU를 차지한 시간
 
 ### Options
-* a : memory 영역 정보를 buff와 cache대신 active/inactive (사용중 메모리 양/미사용 메모리 양)로 출력
-* d : 디스크 사용량 출력
-  * reads, writes 
-    * total : 성공한 모든 읽기/쓰기 작업 개수
-    * merged : 하나의 I/O로 묶은 읽기/쓰기 작업 수
-    * sectors : 성공적으로 읽은/쓰기 섹터 수
-    * ms : 읽기/쓰기 작업을 하는데 소요된 시간(밀리초)
-  * I/O (입출력)
-    * cur : 현재 수행 중인 I/O 수 
-    * sec : I/O를 수행하는데 소요된 시간(초)
-```shell
-disk- ------------reads------------ ------------writes----------- -----IO------
-total merged sectors ms total merged sectors ms cur sec
-ram0 0 0 0 0 0 0 0 0 0 0
-sda 10864 5487 541394 55154 6140 14695 166258 47768 0 29
-sdb 874 941 4334 785 24 17 200 47 0 0
-```
-* n : 헤더를 반복해서 출력하지 않도록 설정
 * S : 출력되는 데이터 단위 지정 (k(1000), K(1024), m(1000000), M(1048576) 으로 나누값 출력)
 
 [[참고. vmstat 분석 방법]](https://waspro.tistory.com/155)
 
 <br>
 
-# free
-* 메모리 사용량, 여유량, 캐싱메모리 출력
-* swap 영역의 크기도 출력해주며, 값이 0 이 아닐경우, 시스템 메모리가 부족하다는 의미이므로 원인 분석 필요
-  * 특정 프로세스가 사용하는 전체 swap 영역에 대한 정보 확인시 /proc/< pid >/status 파일을 통해 확인 가능
-* shared, buffers, cached 에는 swap 영역도 포함되어있음
-  * 따라서 단순히 메모리 사용 용량 = 메모리 전체 - free - buff/cache 식으로 계산하면 메모리 사용 용량을 과소 평가하게 된다
-* 리눅스는 유휴 공간을 캐시 영역으로 잡아두는 습성이 있어 실질적인 의미의 메모리사용률을 구하려면 캐시 영역도 유휴 메모리로 봐야 한다
-  * 명목메모리 사용률 = used / total = ( total - free ) / total
-  * 실질메모리 사용률 = used2 / total = ( total - free2[2] ) / total = ( total - free - buffers - cached) / total
-  * free 열의 두번째 행이 실질적인 유휴메모리 용량이다.
-  ![image](https://user-images.githubusercontent.com/48702893/164437435-c1e1350d-5b23-400f-8462-c07ee5de56d9.png)
-
-```shell
-$ free -m
-             total       used       free     shared    buffers     cached
-Mem:        245998      24545     221453         83         59        541
--/+ buffers/cache:      23944     222053
-Swap:            0          0          0
-```
-
-### Columns
-* Mem
-  * total: 총 메모리
-  * used: 사용 된 메모리
-  * free: 사용되지 않은 메모리
-  * shared: 여러 프로세스에 공유중인 메모리
-  * buffer: 커널 버퍼가 사용중인 메모리
-  * cache: 페이지 cache와 slab으로 사용중인 메모리
-  * buff/cache: buffer와 chche의 합
-  * available: 스와핑없이 새로운 프로세스에 할당 가능한 메모리 예상 크기
-* -/+ buffers/cache
-  * used : (캐시메모리가 제외된)사용된 메모리
-  * free : (캐시메모리가 포함된)사용되지 않은 메모리
-* Swap
-  * total: 총 스왑 메모리
-  * used: 사용중인 스왑 메모리
-  * free: 사용 가능한 스왑 메모리
-
-### Options
-* 단위 변경 : 바이트(b), 키비바이트(k), 메비바이트(m), 기비바이트(g), 테비바이트(tebi), 페비바이트(pebi), 킬로바이트(kilo), 메가바이트(mega), 기가바이트(giga), 페타바이트(peta)
-* t : 합계 칼럼 추가
-* c : 지정한 반복 횟수만큼 free 연속해서 재실행
-* s : 지정한 초만큼 딜레이를 주고 반복 실행
-
-[[참고. linux 메모리 구조]](https://www.whatap.io/ko/blog/37/)
-
-<br>
-
-# sar
+## sar
 * cpu, memory, network, disk io 등의 지표 정보를 수집하여 sar command을 통해 실시간으로 지표를 보여 주며 파일로 저장
 * 옵션에 따라 모니터링 대상이 상당히 넓은 편이며 기본값은 cpu 사용량 통계
 * sar <interval> <count>
@@ -310,7 +236,7 @@ Swap:            0          0          0
   * 현재의 Workload 상에서 어느 정도의 RAM 또는 SWAP 이 더 필요할지를 예측하여 Out of memory가 발생하지 않을 만한 메모리 양이다
 * %commit : kbcommit의 점유 백분율
 * kbactive (Active)
-  * 사용 중인 메모리에서, 최근에 사용된 메모리 정보 
+  * 사용 중인 메모리에서, 최근에 사용된 메모리 정보
   * 메모리 부족으로 여유 메모리를 확보 (reclaiming) 할 때 후순위의 크기
 * kbinact (Inactive)
   * 사용 중인 메모리에서 최근에 사용되지 않은 영역의 크기
@@ -329,7 +255,7 @@ Swap:            0          0          0
 
 * pgpgin/s : 초당 page in (KB/s) 된 크기
 * pgpgout/s : 초당 page out (KB/s) 된 크기
-* fault/s : page fault (minor + major) 수 
+* fault/s : page fault (minor + major) 수
 * majflt/s : major 되는 횟수
 * pgfree/s : free page의 초당 개수
 * pgscand/s : kernel에서 page scan 한 횟수
@@ -433,10 +359,10 @@ Swap:            0          0          0
 ![image](https://user-images.githubusercontent.com/48702893/164513492-3081ad9c-4681-45c8-adbd-e7c62740aa73.png)
 
 * totsck
-  * 총 사용된 socket 수 
+  * 총 사용된 socket 수
   * 65000개 이상 발생 시 더 이상 소켓 생성이 안되어 문제가 될 수 있음
 * tcpsck
-  * 현재 사용 중인 TCP 소켓 수 
+  * 현재 사용 중인 TCP 소켓 수
   * 해당 지표가 최대치로 올라갈 경우 net.ipv4.ip_local_port_range 커널 값에 설정된 값과 비교하여 디버깅
 
 ### sar -n IP
@@ -469,7 +395,7 @@ Swap:            0          0          0
 
 ### sar -n TCP
 * ipv4 tcp 지표, TCP 통신량을 요약해서 보여준다.
-* active와 passive 수를 보는것은 서버의 부하를 대략적으로 측정하는데에 편리하다. 
+* active와 passive 수를 보는것은 서버의 부하를 대략적으로 측정하는데에 편리하다.
 * retransmits은 네트워크나 서버의 이슈가 있음을 이야기한다. 신뢰성이 떨어지는 네트워크 환경이나(공용인터넷), 서버가 처리할 수 있는 용량 이상의 커넥션이 붙어서 패킷이 드랍되는것을 이야기한다.
 
 ![image](https://user-images.githubusercontent.com/48702893/164513847-1d023301-9b0f-4d2e-ac82-1d1079148300.png)
@@ -504,7 +430,327 @@ Swap:            0          0          0
 
 <br>
 
-# uptime
+# Memory
+## free
+* 메모리 사용량/여유량, swap공간 사용량/여유량 출력
+* Swap 영역 사용량을 확인하여, 주로 메모리 부족 여부 모니터링으로 활용
+  * 운영체제는 메모리가 부족할시, buff/cache 용으로 할당된 메모리에 저장된 데이터들중, stale 한 데이터는 swap-out 하여 유휴 메모리 공간 확보
+
+```shell
+$ free -m
+              total        used        free      shared  buff/cache   available
+Mem:       24522068    17740236     1843852       99952     4937980     6502400
+Swap:       4194300      228956     3965344
+```
+
+### Columns
+* Mem
+  * total: 총 메모리
+  * used: 사용 된 메모리
+  * free: 사용되지 않은 메모리
+  * shared: 여러 프로세스에 공유중인 메모리
+  * buff/cache: buffer 영역과 cache 영역의 합
+    * 여유메모리공간을 주로 buffer 나 cache 영역으로 사용
+    * buff : 디스크 블록으로부터 빠르게 데이터를 조회하기위해 디스크 블록 메타데이터를 캐싱하는 영역
+    * cache : 페이지 캐싱 및 파일 메타데이터 캐싱
+  * available: 스와핑없이 새로운 프로세스에 할당 가능한 메모리 예상 크기
+* Swap
+  * total: 총 스왑 메모리
+  * used: 사용중인 스왑 공간 크기
+  * free: 사용 가능한 스왑 공간 크기
+
+### Options
+* h : 사람이 읽기 쉬운단위로 출력
+* t : 합계 칼럼 추가
+
+[[See also]](https://www.whatap.io/ko/blog/37/)
+[[참고. linux 메모리 구조]](https://www.whatap.io/ko/blog/37/)
+
+<br>
+
+## smem
+* 각 프로세스당 메모리 사용률 확인
+* Swap 공간 사용 크기, USS, PSS, RSS 출력
+* ps, top 과 같은 기존 메모리 사용량 출정 명령의 경우 RSS 를 측정하여 부정확하나 smem 은 PSS 를 측정하여 비교적 더 정확
+  * RSS 는 프로세스간에 공유되고있는 공유메모리 영역 크기를 중복으로 측정하기때문에, 메모리 사용량을 과대평가
+  * 그에반해 PSS는 정확한 측정을 위해 공유 메모리 공간에서 각 프로세스들의 fair share 크기를 측정
+* yum 을 이용해 설치 필요
+```shell
+sudo apt-get install smem python-matplotlib python-tk
+```
+
+### Columns
+* USS (Unique Set Size) : 프로세스에 고유하게(공유 page 제외) mapping된 Page 수
+* PSS (Proportional Set Size) : USS + 프로세스에 공유된 page의 비율(그 page를 mapping한 process들의 수에 비례적인 비율)
+* RSS (Resident Set Size) : process에 mapping된 page 수(모든 공유된 Page 포함)
+
+```shell
+[~]$ smem
+  PID User     Command                         Swap      USS      PSS      RSS 
+139224 jisoooh /root/jisoooh/apps/mon/li     1276        4        5       44 
+83584 jisoooh -bash                              0     2512     2609     3372 
+84914 jisoooh python /usr/bin/smem               0     5648     5726     6536 
+153445 jisoooh /root/jisoooh/apps/mon/tr    11900    10344    10380    10820 
+139222 jisoooh /root/jisoooh/apps/mon/no      508    15004    15004    15008 
+139250 jisoooh /root/jisoooh/apps/mon/li     2620    17696    17740    18172 
+139223 jisoooh /root/jisoooh/apps/jdk/bi    34556   377500   380175   383232 
+```
+
+### Options
+* u : 프로세스별 메모리 사용량이 아닌, 프로세스 실행 계정별 사용률 출력
+```shell
+[~]$ smem -u
+User     Count     Swap      USS      PSS      RSS 
+jisoooh     7    50860   428140   431153   437188 
+```
+* -t : 프로세스별 메모리 사용량 총합도 함께 출력
+```shell
+[~]$ smem -t
+  PID User     Command                         Swap      USS      PSS      RSS 
+139224 jisoooh /root/jisoooh/apps/mon/li     1276        4        4       44 
+83584 jisoooh -bash                              0     1944     2158     3376 
+85185 jisoooh python /usr/bin/smem -t            0     5652     5709     6540 
+153445 jisoooh /root/jisoooh/apps/mon/tr    11900    10344    10375    10820 
+139222 jisoooh /root/jisoooh/apps/mon/no      508    15004    15004    15008 
+139250 jisoooh /root/jisoooh/apps/mon/li     2620    17696    17735    18172 
+139223 jisoooh /root/jisoooh/apps/jdk/bi    34556   377500   380172   383232 
+-------------------------------------------------------------------------------
+    7 1                                       50860   428144   431157   437192 
+```
+* -p : 사용량 대신 사용률로 출력
+```shell
+[~]$ smem -p -t
+  PID User     Command                         Swap      USS      PSS      RSS 
+139224 jisoooh /root/jisoooh/apps/mon/li    0.03%    0.00%    0.00%    0.00% 
+83584 jisoooh -bash                          0.00%    0.01%    0.01%    0.01% 
+85446 jisoooh python /usr/bin/smem -p -t     0.00%    0.02%    0.02%    0.03% 
+153445 jisoooh /root/jisoooh/apps/mon/tr    0.28%    0.04%    0.04%    0.04% 
+139222 jisoooh /root/jisoooh/apps/mon/no    0.01%    0.06%    0.06%    0.06% 
+139250 jisoooh /root/jisoooh/apps/mon/li    0.06%    0.07%    0.07%    0.07% 
+139223 jisoooh /root/jisoooh/apps/jdk/bi    0.82%    1.54%    1.55%    1.56% 
+-------------------------------------------------------------------------------
+    7 1                                       1.21%    1.75%    1.76%    1.78% 
+```
+* -s : 특정 필드로 오름차순으로 정렬하여 출력
+```shell
+[~]$ smem -s swap
+  PID User     Command                         Swap      USS      PSS      RSS 
+83584 jisoooh -bash                              0     2520     2617     3380 
+85690 jisoooh python /usr/bin/smem -s swa        0     5652     5730     6540 
+139222 jisoooh /root/jisoooh/apps/mon/no      508    15004    15004    15008 
+139224 jisoooh /root/jisoooh/apps/mon/li     1276        4        5       44 
+139250 jisoooh /root/jisoooh/apps/mon/li     2620    17696    17740    18172 
+153445 jisoooh /root/jisoooh/apps/mon/tr    11900    10344    10380    10820 
+139223 jisoooh /root/jisoooh/apps/jdk/bi    34556   377500   380175   383232 
+```
+
+* -s -r : 특정 필드로 내림차순으로 정렬하여 출력
+```shell
+[~]$ smem -s swap -r
+  PID User     Command                         Swap      USS      PSS      RSS 
+139223 jisoooh /root/jisoooh/apps/jdk/bi    34556   377500   380175   383232 
+153445 jisoooh /root/jisoooh/apps/mon/tr    11900    10344    10380    10820 
+139250 jisoooh /root/jisoooh/apps/mon/li     2620    17696    17740    18172 
+139224 jisoooh /root/jisoooh/apps/mon/li     1276        4        5       44 
+139222 jisoooh /root/jisoooh/apps/mon/no      508    15004    15004    15008 
+85739 jisoooh python /usr/bin/smem -s swa        0     5652     5730     6540 
+83584 jisoooh -bash                              0     2520     2617     3380 
+```
+
+<br>
+
+# CPU
+## mpstat
+* CPU 사용률을 CPU 별로 출력... 사실상 무쓸모
+```shell
+$ mpstat -P ALL 1
+Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)
+
+07:38:49 PM  CPU   %usr  %nice   %sys %iowait   %irq  %soft  %steal  %guest  %gnice  %idle
+07:38:50 PM  all  98.47   0.00   0.75    0.00   0.00   0.00    0.00    0.00    0.00   0.78
+07:38:50 PM    0  96.04   0.00   2.97    0.00   0.00   0.00    0.00    0.00    0.00   0.99
+07:38:50 PM    1  97.00   0.00   1.00    0.00   0.00   0.00    0.00    0.00    0.00   2.00
+07:38:50 PM    2  98.00   0.00   1.00    0.00   0.00   0.00    0.00    0.00    0.00   1.00
+07:38:50 PM    3  96.97   0.00   0.00    0.00   0.00   0.00    0.00    0.00    0.00   3.03
+[...]
+```
+
+<br>
+
+# Disk
+## iostat
+* Disk의 read/write 통계지표 및 CPU 사용률, queue 대기열 길이 등 I/O 작업에 대한 지표 출력
+
+### Columns
+```shell
+[~]$ iostat
+Linux 3.10.0-1160.49.1.el7.x86_64 (test-js001-lisa-jp2v-dev)    08/07/2022      _x86_64_        (1 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.98    0.22    0.82    0.00    0.02   97.96
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+vda               2.03         6.85        34.89   38510186  196191895
+vdb               0.00         0.02         0.00     126504       4088
+```
+#### avg-cpu
+* %user : CPU 가 user 모드에서 사용된 시간의 비율
+* %nice : 작업 우선순위 정책(Nice)에 의해 우선적으로 처리된 프로세서가 사용한 CPU 시간의 비율
+* %system : CPU가 system(kernel) 모드에서 사용된 시간의 비율
+* %iowait : 디스크 입출력을 기다리는데 사용된 CPU 시간의 비율
+* %steal : Steal CPU의 작동시간, 하이퍼바이저가 다른 가상 프로세서에 서비스를 제공하는 동안 가상 CPU가 비자발적으로 대기한 시간의 백분율
+* %idle : 디스크 입출력을 대기하지 않은 유휴상태의 시간 비율, CPU가 유휴 상태이고 디스크 I/O 요청이 없는 시간의 백분율
+
+#### Device
+* tps : 디스크 디바이스에서 초당 처리한 입출력 작업의 개수
+* kB_read/s : 디스크로부터 읽은 데이터의 양(초당 킬로바이트)
+* kB_wrtn/s : 디스크에 쓰여진 데이터의 양(초당 킬로바이트)
+* kB_read : 디스크로부터 읽은 데이터의 총량(킬로바이트)
+* kB_wrtn : 디스크에 쓰여진 데이터의 총량(킬로바이트)
+
+### Options
+* x : 확장 통계 표시
+```shell
+$ iostat -x
+Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+          73.96    0.00    3.73    0.03    0.06   22.21
+
+Device:   rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+xvda        0.00     0.23    0.21    0.18     4.52     2.08    34.37     0.00    9.98   13.80    5.42   2.44   0.09
+xvdb        0.01     0.00    1.02    8.94   127.97   598.53   145.79     0.00    0.43    1.78    0.28   0.25   0.25
+xvdc        0.01     0.00    1.02    8.86   127.79   595.94   146.50     0.00    0.45    1.82    0.30   0.27   0.26
+dm-0        0.00     0.00    0.69    2.32    10.47    31.69    28.01     0.01    3.23    0.71    3.98   0.13   0.04
+dm-1        0.00     0.00    0.00    0.94     0.01     3.78     8.00     0.33  345.84    0.04  346.81   0.01   0.00
+dm-2        0.00     0.00    0.09    0.07     1.35     0.36    22.50     0.00    2.55    0.23    5.62   1.78   0.03
+```
+   * rrqm/s : 큐에 대기 중인 초당 읽기 요청 수
+   * wrqm/s : 큐에 대기 중인 초당 쓰기 요청 수
+   * r/s : 초당 읽기 섹터 수, OS의 block layer가 아니라 Process가 OS의 커널 영역으로 read/write 함수를 호출한 횟수
+   * w/s : 초당 쓰기 섹터 수, OS의 block layer가 아니라 Process가 OS의 커널 영역으로 read/write 함수를 호출한 횟수
+   * rMB/s : 초당 읽기 처리 크기 (r/s X 섹터 크기블록 사이즈 크기
+   * wMB/s : 초당 쓰기 처리 크기 (w/s X 섹터 크기블록 사이즈 크기
+   * avgrq-sz : 요청 건수의 평균 크기
+   * avgqu-sz
+   * 해당 Device에 발생된 request들의 대기 중인 queue의 평균 length
+   * 만약 avgqu-sz 수치보다 await 수치가 훨씬 높으면 디스크 쪽에서 병합이 있다고 판단하면 된다
+   * await(ms)
+   * I/O 처리 평균 시간(스레드가 blocking 되어있는 시간)
+   * 일반적인 장치의 요청 처리 시간보다 긴 경우에는 블럭장치 자체의 문제가 있거나 장치가 포화된 상태
+   * %util : 디바이스에서 요청한 입출력 작업을 수행하기 위해 사용한 CPU 시간의 비율. 이 값이 100%에 근접할 경우 디바이스가 Saturation(한계에 도달) 되었다고 판단할 수 있음
+
+### iostat %util, svctm 지표 오류
+* iostat의 utils 성능 지표 반응은 hdd에 대한 반응만 비교적 정확합니다. 왜냐하면 hdd는 병렬 (직렬) 이 없기 때문입니다.SSD 디스크에 의미 없음
+* iostat의 util 사용률은 디스크의 바쁜 정도를 나타냅니다.기계 디스크 HDD의 경우 성능 지표를 반영할 수 있다.SSD(병렬 IO 지원)의 경우 성능 지표를 반영할 수 없습니다.
+* SSD, NVMe 와 같이 병렬처리가 가능한 디스크 장치에서 svctm 지표 자체가 제대로 계산되지 않아서 제 성능을 내기도 전에 100%의 Utilization 지표를 나타내는 이슈
+* 스핀들 디스크 (SATA, SAS) 등의 경우 병렬 처리가 안되어 iostst 지표의 %util 값이 신뢰할 수 있지만, Nand (Nvme, ssd)의 경우 병렬처리가 가능하여 병렬 처리로 퍼포먼스를 높인 경우 iostat에서 이를 반영하여 계산하지 못하고 %util 에선 과도하게 높은 지표를 출력
+* 따라서 Nand 를 사용하는 장비 일경우, iostat 의 %util 값은 무시
+* [iostat man](https://man7.org/linux/man-pages/man1/iostat.1.html)
+
+<br>
+
+## df (disk free)
+* 장치 전체의 디스크 여유 공간 출력
+
+### Columns
+
+![image](https://user-images.githubusercontent.com/48702893/164439315-8f04e7af-bf1f-4231-b2a3-5b7ac3fc0480.png)
+
+* Filesystem : 마운트된 파일 시스템
+* 1K-blocks(Used) : 파일 시스템 전체 디스크 용량
+* Used : 사용량
+* Available : 남은 용량
+* Use% : 사용량 비율
+* Mounted on : 마운트 된 지점(경로)
+
+### Options
+-a (all) : 모든 파일 시스템 출력
+-h (human) : 사람이 읽기 쉬운 형태(단위)로 출력 (기본은 킬로바이트 단위)
+-T (type) : 보여주는 목록을 파일시스템의 타입으로 제한
+-l (local) : 출력하는 목록을 로컬 파일 시스템으로만 제한
+
+<br>
+
+## du (disk usuage)
+* 특정 디렉토리 및 그 하위 디렉토리의 디스크 사용량 출력
+
+### Columns
+```shell
+[jisoooh@...]$ du ./lib
+8       ./lib/perl5/Apache/TS/Config
+36      ./lib/perl5/Apache/TS
+40      ./lib/perl5/Apache
+4       ./lib/perl5/x86_64-linux-thread-multi/auto/Apache/TS
+4       ./lib/perl5/x86_64-linux-thread-multi/auto/Apache
+4       ./lib/perl5/x86_64-linux-thread-multi/auto
+8       ./lib/perl5/x86_64-linux-thread-multi
+48      ./lib/perl5
+4       ./lib/pkgconfig
+23020   ./lib
+```
+
+### Options
+* h : 사람이 읽기 쉬운 형식으로 출력
+```shell
+[...]$ du -h ./lib
+8.0K    ./lib/perl5/Apache/TS/Config
+36K     ./lib/perl5/Apache/TS
+40K     ./lib/perl5/Apache
+4.0K    ./lib/perl5/x86_64-linux-thread-multi/auto/Apache/TS
+4.0K    ./lib/perl5/x86_64-linux-thread-multi/auto/Apache
+4.0K    ./lib/perl5/x86_64-linux-thread-multi/
+auto
+8.0K    ./lib/perl5/x86_64-linux-thread-multi
+48K     ./lib/perl5
+4.0K    ./lib/pkgconfig
+23M     ./lib
+```
+* s : 특정 디렉토리의 총 디스크 사용량 출력
+```shell
+[...]$ du -s ~/apps
+1436748 /apps
+```
+* s * : 특정 디렉토리 하위 1 depth 디렉토리들의 디스크 사용량 출력
+```shell
+[...]$ du -s * ~/apps
+149540  bin
+372     etc
+400     include
+23020   lib
+42248   libexec
+0       plugin
+36      share
+177544  var
+```
+* sort -n : 특정 디렉토리 및 그 하위 디렉토리 디스크 사용량을 정렬하여 출력
+```shell
+[,,,]$ du -sh * ~/apps/ | sort -n
+0       plugin
+23M     lib
+36K     share
+42M     libexec
+147M    bin
+174M    var
+372K    etc
+400K    include
+1020M   /root/jisoooh/apps/
+```
+
+* sort -n | tail 5 : 정렬 하여 상위 5개 출력
+```shell
+[...]$ du -h ~/apps/ | sort -n | tail -5
+952K    /apps/SRC/trafficserver-8.1.4/plugins/escalate
+976K    /apps/SRC/trafficserver-8.1.4/plugins/experimental/hipes
+1004K   /apps/SRC/trafficserver-8.1.4/doc/locale/ja/LC_MESSAGES/developer-guide/api
+1011M   /apps/SRC/trafficserver-8.1.4
+1020M   /apps/SRC
+```
+
+<br>
+
+# ETC
+## uptime
 * 서버 구동 시간 및 접속해있는 사용자수, load average 값 출력(모두 top 명령어로 확인 가능)
 ```shell
 $ uptime
@@ -523,23 +769,6 @@ $ dmesg | tail
 [1880957.563400] Out of memory: Kill process 18694 (perl) score 246 or sacrifice child
 [1880957.563408] Killed process 18694 (perl) total-vm:1972392kB, anon-rss:1953348kB, file-rss:0kB
 [2320864.954447] TCP: Possible SYN flooding on port 7001. Dropping request.  Check SNMP counters.
-```
-
-<br>
-
-# mpstat
-* CPU 사용률을 CPU 별로 출력 
-```shell
-$ mpstat -P ALL 1
-Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)
-
-07:38:49 PM  CPU   %usr  %nice   %sys %iowait   %irq  %soft  %steal  %guest  %gnice  %idle
-07:38:50 PM  all  98.47   0.00   0.75    0.00   0.00   0.00    0.00    0.00    0.00   0.78
-07:38:50 PM    0  96.04   0.00   2.97    0.00   0.00   0.00    0.00    0.00    0.00   0.99
-07:38:50 PM    1  97.00   0.00   1.00    0.00   0.00   0.00    0.00    0.00    0.00   2.00
-07:38:50 PM    2  98.00   0.00   1.00    0.00   0.00   0.00    0.00    0.00    0.00   1.00
-07:38:50 PM    3  96.97   0.00   0.00    0.00   0.00   0.00    0.00    0.00    0.00   3.03
-[...]
 ```
 
 <br>
@@ -568,79 +797,7 @@ Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU
 
 <br>
 
-# iostat
-* Disk의 read/write 통계지표 및 CPU 사용률, queue 대기열 길이 등 I/O 작업에 대한 지표 출력
-* Disk I/O 작업에 문제가 발생할 때 주로 확인
 
-### Columns
-
-```shell
-$ iostat -xz 1
-Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)
-
-avg-cpu:  %user   %nice %system %iowait  %steal   %idle
-          73.96    0.00    3.73    0.03    0.06   22.21
-
-Device:   rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
-xvda        0.00     0.23    0.21    0.18     4.52     2.08    34.37     0.00    9.98   13.80    5.42   2.44   0.09
-xvdb        0.01     0.00    1.02    8.94   127.97   598.53   145.79     0.00    0.43    1.78    0.28   0.25   0.25
-xvdc        0.01     0.00    1.02    8.86   127.79   595.94   146.50     0.00    0.45    1.82    0.30   0.27   0.26
-dm-0        0.00     0.00    0.69    2.32    10.47    31.69    28.01     0.01    3.23    0.71    3.98   0.13   0.04
-dm-1        0.00     0.00    0.00    0.94     0.01     3.78     8.00     0.33  345.84    0.04  346.81   0.01   0.00
-dm-2        0.00     0.00    0.09    0.07     1.35     0.36    22.50     0.00    2.55    0.23    5.62   1.78   0.03
-```
-
-* rrqm/s : 큐에 대기 중인 초당 읽기 요청 수
-* wrqm/s : 큐에 대기 중인 초당 쓰기 요청 수
-* r/s : 초당 읽기 섹터 수, OS의 block layer가 아니라 Process가 OS의 커널 영역으로 read/write 함수를 호출한 횟수
-* w/s : 초당 쓰기 섹터 수, OS의 block layer가 아니라 Process가 OS의 커널 영역으로 read/write 함수를 호출한 횟수
-* rMB/s : 초당 읽기 처리 크기 (r/s X 섹터 크기블록 사이즈 크기
-* wMB/s : 초당 쓰기 처리 크기 (w/s X 섹터 크기블록 사이즈 크기
-* avgrq-sz : 요청 건수의 평균 크기
-* avgqu-sz 
-  * 해당 Device에 발생된 request들의 대기 중인 queue의 평균 length
-  * 만약 avgqu-sz 수치보다 await 수치가 훨씬 높으면 디스크 쪽에서 병합이 있다고 판단하면 된다
-* await(ms)
-  * I/O 처리 평균 시간(스레드가 blocking 되어있는 시간) 
-  * 일반적인 장치의 요청 처리 시간보다 긴 경우에는 블럭장치 자체의 문제가 있거나 장치가 포화된 상태
-* %util : Disk 가 버틸 수 있는 한계치를 %로 표시
-
-### iostat %util, svctm 지표 오류
-* iostat의 utils 성능 지표 반응은 hdd에 대한 반응만 비교적 정확합니다. 왜냐하면 hdd는 병렬 (직렬) 이 없기 때문입니다.SSD 디스크에 의미 없음
-* iostat의 util 사용률은 디스크의 바쁜 정도를 나타냅니다.기계 디스크 HDD의 경우 성능 지표를 반영할 수 있다.SSD(병렬 IO 지원)의 경우 성능 지표를 반영할 수 없습니다.
-* SSD, NVMe 와 같이 병렬처리가 가능한 디스크 장치에서 svctm 지표 자체가 제대로 계산되지 않아서 제 성능을 내기도 전에 100%의 Utilization 지표를 나타내는 이슈
-* 스핀들 디스크 (SATA, SAS) 등의 경우 병렬 처리가 안되어 iostst 지표의 %util 값이 신뢰할 수 있지만, Nand (Nvme, ssd)의 경우 병렬처리가 가능하여 병렬 처리로 퍼포먼스를 높인 경우 iostat에서 이를 반영하여 계산하지 못하고 %util 에선 과도하게 높은 지표를 출력
-* 따라서 Nand 를 사용하는 장비 일경우, iostat 의 %util 값은 무시
-* [iostat man](https://man7.org/linux/man-pages/man1/iostat.1.html)
-```
-Percentage of elapsed time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100% for devices serving requests serially.  But for devices serving requests in parallel, such as RAID arrays and modern SSDs, this number does not reflect their performance limits.
-```
-
-![image](https://user-images.githubusercontent.com/48702893/164441840-803cf6a7-68d4-45cd-9904-00002ce120cc.png)
-> job=3부터 이미 %util 은 최대치를 뿌려주고 있습니다 하지만 부하를 더 줄수록 write 성능은 계속 올라갑니다 즉 %util 필드 자체는 의미가 없게 됩니다.
-
-<br>
-
-# df (disk free)
-* 디스크 여유 공간 출력
-* 파일시스템,디스크크기, 사용량, 여유공간, 사용률, 마운트지점 순으로 출력
-
-### Columns
-
-![image](https://user-images.githubusercontent.com/48702893/164439315-8f04e7af-bf1f-4231-b2a3-5b7ac3fc0480.png)
-
-* Filesystem : 리눅스에 마운트된 파일 시스템
-* Size(1K-blocks) : 전체 디스크 용량
-* Used : 사용량
-* Available : 남은 용량
-* Use% : 용량 대비 사용량 비율
-* Mounted on : 마운트 된 지점(경로)
-
-### Options
--a (all) : 모든 파일 시스템 출력
--h (human) : 사람이 읽기 쉬운 형태(단위)로 출력 (기본은 킬로바이트 단위)
--T (type) : 보여주는 목록을 파일시스템의 타입으로 제한
--l (local) : 출력하는 목록을 로컬 파일 시스템으로만 제한
 
 <br>
 
@@ -697,37 +854,6 @@ netstat -anp | grep LISTEN : listen 되는 모든 포트 출력
 # traceroute
 * 지정된 호스트까지 패킷이 전달되는 경로 출력
 * ping이 날라가지 않을 경우, traceroute을 통해 호스트 자체에 문제가 있는지, 호스트에 도달하기까지 네트워크 경로중에 문제가 있는지 알아볼 수 있다.
-
-<br>
-
-# Troubleshooting
-### CPU 
-* top 이나 sar 를 이용해 load average 를 확인하여 CPU 부하 확인 
-* CPU 부하가 높다면, top 의 us, sy, wa column 을 확인하여 유저 영역과 커널 영역, IO 작업중 어느 부분에서 많은 부하가 발생중인지 확인
-  * 일반적으로 커널 영역의 CPU 사용률은 30% 이하, IO Wait CPU 사용률은 20% 이하 
-* ps 로 프로세스 상태나, CPU 사용시간등을 확인하여, 어느 프로세스에서 부하를 유발중인지 확인
-  * 프로세스 찾은후, 좀 더 상세한 정보가 필요할 경우 strace 명령어로 어플리케이션의 systemcall 을 추적하거나 oprofile 로 프로파일링하여 병목지점 좁혀나감 
-* 커널영역의 부하가 높을경우, truss, pstack, jstack 등을 이용해 어떤 유형의 시스템 콜에서 부하를 유발중인지 확인
-* IO Wait 인 CPU 사용률이 높을경우, netstat, iostat, sar 등을 이용해 입출력이 과다하게 발생하는것은 아닌지 디스크 사용률등을 확인
-* 안정적인 운영을 위한 CPU 사용율 기준 
-  * CPU 사용률 : CPU 70% 이하 
-  * CPU 실행큐 : CPU core 당 평균 3개 이하
-  
-### Memory
-* 메모리 사용패턴이 100% 라고 해도 부족하지 않으면 성능저하가 발생하지 않고, Java 어플리케이션은 설정한 힙메모리 이상을 사용하지 않기때문에 운영체제 메모리 부족이 발생할 가능성은 낮음
-* top 이나, vmstat, free 등의 명령어로 swap 공간이 사용되고 있는지 확인하여 메모리 부족 여부 판별
-  * 스왑이 발생하고 있는 경우:
-    1. 특정 프로세스가 극단적으로 메모리를 소비하고 있지 않는 지 ps명령어로 확인할 수 있다.
-    2. 프로그램 오류로 메모리를 지나치게 사용하는 경우, 프로그램을 개선한다.
-    3. 탑재된 메모리가 부족한 경우에는 메모리를 증설한다. 메모리를 증설할 수 없는 경우에는 분산을 검토한다.
-  * 스왑이 발생하지 않고, 디스크로의 입출력이 빈번하게 발생하고 있는 상황:
-    *캐시에 필요한 메모리가 부족한 경우로 생각해볼 수 있다. 해당 서버가 저장하고 있는 데이터 용량과 증설 가능한 메모리량을 비교해서 다음과 같이 나눠서 검토한다.
-    1. 메모리 증설로 캐시영역을 확대시킬 수 있는 경우는 메모리를 증설한다.
-    2. 메모리 증설로 대응할 수 없는 경우는 데이터 분산이나 캐시서버 도입등을 검토한다. 물론, 프로그램을 개선해서 I/O빈도를 줄이는것도 검토가능하다.
-* 메모리가 부족하다면, top 이나 ps -euf 명령어로 어느 프로세스에서 메모리 사용률이 높은지 확인하여 조치 
-* 안정적인 운영을 위한 메모리 판단 기준 
-  * 메모리 사용률 : 100% 이하
-  * 지속적으로 프로세스 스와핑이 발생하지 않는지 확인
 
 ***
 > Reference
