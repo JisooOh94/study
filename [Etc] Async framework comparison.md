@@ -5,67 +5,58 @@
     * [Akka](https://github.com/akka)
     * [Ratpack](https://github.com/ratpack)
 
-### [Benchmark](https://www.techempower.com/benchmarks/#section=data-r21&f=zijunz-zik0zj-zik0zj-v2qiv3-zik0zj-zijbpb-zik0zj-zik0zj-hra0hr-zik0zj-zik0zj-zik073-zik0zj-35r)
-<img width="1190" alt="image" src="https://user-images.githubusercontent.com/48702893/188261517-b1122170-33ad-4ffc-b331-2c93339d94b6.png">
-
-### [Popularity](https://stackshare.io/stackups/ratpack-vs-vert-x-vs-akka)
-<img width="858" alt="image" src="https://user-images.githubusercontent.com/48702893/188261415-948989c4-de13-4748-86d6-de92a48724c1.png">
-
 # [Vert.x](https://vertx.io/)
 * Verticle 로 구성되는 비동기 웹애플리케이션 개발 프레임워크
 
 ### Verticle
-* vert.x에서 배치(deploy)의 기본 단위
-  * Java로 생각하면 독립적으로 실행 가능한 Class 또는 .jar 파일 (main 메서드가 있는 클래스)
-* 애플리케이션은 하나의 Verticle로 이루어질 수도 있고, event bus를 통해 서로 통신하는 여러 개의 Verticle로 이루어질 수도 있음
-  * verticle 은 보통 Netty 와 비슷하게 클라이언트의 연결 요청을 수락하는 하나의 Main verticle 과 IO 작업 및 처리를 담당할 n개의 worker verticle 로 구성
-  * 멀티코어환경일경우, 동시에 여러개의 ELP 스레드를 구동하며 이와 함께 동작하는 여러개의 Main verticle 및 worker verticle을 함께 구성 가능
+* 독립적으로 실행가능한 하나의 작은 서비스
+  * Java로 생각하면 독립적으로 실행 가능한 Class 또는 .jar 파일 (main 메서드가 있는 클래스), Servlet
+* 애플리케이션은 하나의 Verticle로 이루어질 수도 있고, 여러 개의 Verticle로 이루어질 수도 있다 
+* 애플리케이션 실행시 하나의 vertx 인스턴스가 만들어지고, 각각의 Verticle 들이 인스턴스 안에서 개별적인 스레드로 생성된다.
+  * 일반적인 스레드와 다르게, 각각의 Verticle 들은 고유의 ClassLoader 를 가져 공유 데이터 영역이 없다. Event Bus 를 통해 상호간에 통신한다
+      * 그러나 Verticle 간 공유되어야 더 효율적인 데이터들(e.g. 캐시)도 존재한다. 이를 위해 별도의 굥유 데이터를 위한 영역인 Shared Map 을 지원하며 immutable 데이터만 shared map 에 저장할 수 있다
+  * 또한 여러호스트에서 구동중인 Vertx 인스턴스들을 Event Bus 를 통해 간편하게 클러스터링 할 수 있다.
   
-    ![image](https://user-images.githubusercontent.com/48702893/189471986-8790906a-c54e-4fa6-a419-0f18104195fd.png)
+  ![image](https://user-images.githubusercontent.com/48702893/194755863-9632477a-46bd-4e58-84e9-126ae690b88b.png)
 
 ### Event Bus
-* Verticle 간 데이터 교환이나, 클러스터링 되어있는 vertx 인스턴스간 통신 통로
-* Point to Point나 Pub/Sub 같은 MQ 기능을 사용 가능
+* Verticle 간, (클러스터링 되어있는) vertx 인스턴스간 데이터 통신 통로
+* 내부적으로 Hazelcast 데이터 그리드 솔루션 사용하여 신뢰성 및 안정성 보장
+* Point to Point나 Pub/Sub 같은 MQ 기능 사용 가능
 
 ### 장점
-1. Clustering
-* 여러 호스트에 동시에 여러개의 vert.x 인스턴스를 실행하고 이들간의 event bus를 형성해서 클러스터링 가능
+1. Event Bus 를 이용한 간편한 Vert.x 인스턴스 Clustering 지원
 
-2. Polyglot
-* vert.x 자체는 Java로 작성되었지만, vert.x를 사용하기 위해 반드시 Java를 사용할 필요는 없음
-* Java나 Groovy 같이 JVM 동작을 전제로 한 언어 뿐만 아니라 Ruby나 Python, JS, Kotlin 으로도 vert.x 프레임워크 사용 가능
-* Spring framework 에도 Integration 가능
+2. Polyglot 랭귀지
+   * Java뿐만 아니라 Ruby나 Python, JS, Kotlin 등 다양한 언어에 vert.x integration 가능
 
 3. Simple Concurrency model
-* 싱글 스레드 애플리케이션을 작성하듯 멀티 스레드 애플리케이션 개발 가능 (synchronized나 volatile 같은 동기화를 위한 locking 처리 불필요)
+  * 서로 데이터 교환 없이 경량 프로세스처럼 동작하는 Verticle 덕분에, blocking 로직 작성하듯((synchronized나 volatile 같은 동기화를 위한 locking 처리 불필요) non-blocking 애플리케이션 개발 가능
 
-4. 낮은 진입장벽
-* EventHandler만 구현하면 되기 때문에 코딩양도 적고, 컴파일 없이(???) 바로 실행해볼 수 있기 때문에 개발 및 테스트가 편함
-* Tutorial 도 정리가 잘되어있다. (https://vertx.io/docs/)
+4. 높은 동시성
+* Vertx 의 Verticle 들은 서로 공유 데이터 영역 없이 개별적인 경량 프로세스처럼 동작한다. 
+* 이덕분에 하나의 vertx 인스턴스에서 여러개의(보통 core 수 만큼) ELP 스레드를 띄워 동시에 더 많은 요청을 처리할 수 있다. 
+  * Node.js와 같은 기존의 비동기 프레임워크의 경우 Single Thread기반의 ELP를 하나만 띄울 수 있기 때문에, Core수가 많아도, 이를 사용할 Thread가 없어 대량의 멀티코어 CPU 에서 성능이 크게 늘어나지 않음
+  * 물론 Node.js도 여러개의 Node.js Process를 동시에 띄워서 여러개의 Core를 동시에 사용할 수 는 있지만 Process의 Context Switching 비용이 Thread의 Context Switching 비용보다 크기 때문에, 여러개의 Thread 기반으로 동작하는 Vert.x가 성능면에서 더 유리
 
-5. 높은 격리성
-* 각각의 Verticle은 고유의 클래스 로더를 가져 Verticle 간에 스태틱 멤버, 글로벌 변수 등을 통한 직접적인 상호작용을 방지
-* 이덕분에, WAS의 Multi threading 모델과는 다르게, 여러개의 Thread를 띄우더라도 각 Thread가 객체나 자원의 공유 없이 마치 프로세스처럼 독립적으로 동작
+![image](https://user-images.githubusercontent.com/48702893/194757382-916c2de6-96b5-4fe8-99ae-75db62b3b329.png)
 
-6. 멀티코어 환경에서의 높은 성능
-* 높은 격리성 덕분에 싱글스레드로 동작하는 ELP를 동시에 여러개 띄울수있어, 멀티코어환경에서 더 높은 동시성과 성능 보장
-* Node.js와 같은 기존의 비동기 프레임워크의 경우 Single Thread기반의 ELP를 하나만 띄울 수 있기 때문에, Core수가 많아도, 이를 사용할 Thread가 없어 대량의 멀티코어 CPU 에서 성능이 크게 늘어나지 않음
-* 물론 Node.js도 여러개의 Process를 동시에 띄워서 여러개의 Core를 동시에 사용할 수 는 있지만 Process의 Context Switching 비용이 Thread의 Context Switching 비용보다 크기 때문에, 여러개의 Thread 기반으로 동작하는 Vert.x가 성능면에서 더 유리
+![image](https://user-images.githubusercontent.com/48702893/194757388-92b3f92c-e687-499f-96c3-1fe76d610da1.png)
 
-7. Embedded Vertx
+###### 출처 : https://d2.naver.com/helloworld/163784
+
+5. Embedded Vertx
 * Vertx는 자체가 서버로써 독립적으로 동작할 수 있을 뿐만 아니라 라이브러리 형태로도 사용이 가능
-* 그렇기때문에 Tomcat 같은 WAS와 함께 기동이 될 수 있어, 하나의 JVM에서 Tomcat 서비스와 Vert.x 서비스를 같이 수행하는 것이 가능
+* 그렇기때문에 Tomcat 같은 WAS와 함께 기동이 될 수도 있고, 하나의 JVM에서 Tomcat 서비스와 Vert.x 서비스를 같이 수행하는 형태도 가능
   > e.g. 일반적인 HTTP Request는 Tomcat으로 처리하고, SocketIO나 WebSocket과 같은 Concurrent connection이 많이 필요한 Request는 Vert.x 모듈을 이용해서 처리하게 구성 가능
-   
-8. 성능이 이미 입증된 모듈을 도입하여 성능에 대한 신뢰성을 보장
-* 보통, 새로나온 프레임워크들은 성능에 대한 의심을 피할 수 없는데, Vert.x는 성능을 이미 입증받은 기존 도구들을 가져와 자신들의 방식에 맞게 녹여내어 안정성 보장
-  > Netty를 서버 엔진으로 사용하고 있고, EventBus에 HazelCast 사용
+* 이와같은 유연함때문에 얻는 장점이 큰데 후술예정.
 
 > Ref
 > * https://d2.naver.com/helloworld/163784
 > * https://bcho.tistory.com/860
 > * https://www.baeldung.com/vertx
 > * https://invisible-blog.tistory.com/42
+> * https://www.baeldung.com/spring-vertx
 
 <br>
 
@@ -137,6 +128,58 @@
 > * https://changun516.tistory.com/196
 > * https://azderica.github.io/00-akka-starter/
 > * https://getakka.net/articles/clustering/cluster-overview.html
+> * https://wiki.webnori.com/display/AKKA/Spring+Boot+With+AKKA
+> * https://brunch.co.kr/@springboot/172
+> * https://www.linkedin.com/pulse/spring-boot-akka-part-1-aliaksandr-liakh/
+> * https://www.baeldung.com/akka-with-spring
+
+<br>
+
+# Comparison
+### [Benchmark](https://www.techempower.com/benchmarks/#section=data-r21&f=zijunz-zik0zj-zik0zj-v2qiv3-zik0zj-zijbpb-zik0zj-zik0zj-hra0hr-zik0zj-zik0zj-zik073-zik0zj-35r)
+<img width="1190" alt="image" src="https://user-images.githubusercontent.com/48702893/188261517-b1122170-33ad-4ffc-b331-2c93339d94b6.png">
+
+### [Popularity](https://stackshare.io/stackups/ratpack-vs-vert-x-vs-akka)
+<img width="858" alt="image" src="https://user-images.githubusercontent.com/48702893/188261415-948989c4-de13-4748-86d6-de92a48724c1.png">
+
+### Spring Webflux vs Vert.x
+#### Microservices
+* MSA 환경에서, vert.x 는 verticle 및 vert.x 인스턴스들이 독립적으로 동작하며 event-bus 로만 상호 작용하므로, Component 간 loosely coupled 되어있다 할 수 있다
+* 따라서 vert.x 는 event-bus 를 사용하는 어떠한 JVM 기반 언어의 컴포넌트와도 함께 동작 할 수 있다.
+* 반면에, Spring webflux 는 컴포넌트간 강결합 되기 떄문에, Java 나 Kotlin 으로 개발된 컴포넌트와만 함께 동작 할 수 있다. 
+
+#### Other Protocols
+* Webflux 와 Vert.x 는 모두 Netty 기반으로 동작하나 지원하는 애플리케이션 개발 범위가 다르다.
+* Webflux는 HTTP 프로토콜 기반으로 동작하는 웹어플리케이션 개발을 위한 언어이다.
+* 반면에 vert.x는 HTTP 웹 애플리케이션 개발 뿐만 아니라, TCP/UDP 프로토콜 기반 어플리케이션, Unix domain socket 어플리케이션 개발도 지원하다.  
+
+#### Blocking and Relational Databases
+* Blocking 로직은 비동기 어플리케이션 개발할떄 항상 문제가 되어왔다. 
+* 스레드수를 적게 생성하는 비동기 어플리케이션 특성상 blocking 로직이 어플리케이션에 다수 존재하면 throughput 이 급격히 떨어진다.
+* 또한 관계형 db 와 통신하는 비동기 어플리케이션도 문제가 많았는데, 현재까진 관계형 db와의 Non-blocking 통신을 지원하는 공식적인 데이터베이스 driver가 존재하지 않기 때문이다.
+* 이에따라, Spring 에선 이렇게 블로킹 로직이 많은 애플리케이션이나 관계형 DB 를 사용해야하는 애플리케이션엔 webflux보단 Spring MVC 를 사용하도록 가이드 하고 있다.
+<img width="962" alt="image" src="https://user-images.githubusercontent.com/48702893/194759716-0285714b-694c-4a47-9946-88d01801724a.png">
+
+* 하지만 Vert.x 는 위와 동일한 상황에 대해 몇가지 workaround 를 제공한다
+  1. The Vert.x JDBC Module, which is an asynchronous API wrapper around JDBC.
+  2. The executeBlocking call in Vert.x Core.
+  3. Using a completely separate Verticle called a Worker Verticle which runs in a defined set of thread pools.
+
+#### Performance
+* 그리고 무엇보다, benchmark 에서도 알 수 있듯이, Vert.x 가 Webflux 보다 성능이 좋다
+* 하지만 Webflux 는 성능은 다소 떨어진다 해도, 거대한 커뮤니티를 형성하고 있고 레퍼런스또한 방대하다. 게다가 지원하는 써드파티모듈 또한 다양하다.
+* 따라서, 라이브러리 형태로도 integration 할 수 있는 vert.x 특성을 이용하여 vert.x 와 spring 을 함께 사용하는것도 하나의 솔루션이 될 수 있다.
+    > e.g. 인증 처리는 spring 에서 제공하는 OAuth 2.0 을 이용하고, 비즈니스 로직은 verticle 을 통해 수행되도록 구성
+
+> Ref
+> * https://blog.rcode3.com/blog/vertx-vs-webflux/
+> * https://stackoverflow.com/questions/47711528/spring-webflux-vs-vert-x
+
+### Spring Webflux vs Akka
+* TBU
+
+### Akka vs Vert.x
+* TBU
 
 <br>
 
