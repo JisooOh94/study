@@ -27,8 +27,9 @@
 ### 장점
 1. Event Bus 를 이용한 간편한 Vert.x 인스턴스 Clustering 지원
 
-2. Polyglot 랭귀지
-   * Java뿐만 아니라 Ruby나 Python, JS, Kotlin 등 다양한 언어에 vert.x integration 가능
+2. Polyglot
+   * Java나 kotlin, groovy 처럼 jdk 기반 언어 뿐만아니라 Ruby나 Python, JS 등 다양한 언어에 vert.x integration 가능
+   * Verticle 간에는 event bus 를 통해 json 포맷 메시지 기반으로 통신하므로, 하나의 vert.x 인스턴스 내에서 여러 언어로 개발된 verticle 들이 함께 동작 가능
 
 3. Simple Concurrency model
   * 서로 데이터 교환 없이 경량 프로세스처럼 동작하는 Verticle 덕분에, blocking 로직 작성하듯((synchronized나 volatile 같은 동기화를 위한 locking 처리 불필요) non-blocking 애플리케이션 개발 가능
@@ -43,13 +44,12 @@
 
 ![image](https://user-images.githubusercontent.com/48702893/194757388-92b3f92c-e687-499f-96c3-1fe76d610da1.png)
 
-###### 출처 : https://d2.naver.com/helloworld/163784
-
 5. Embedded Vertx
 * Vertx는 자체가 서버로써 독립적으로 동작할 수 있을 뿐만 아니라 라이브러리 형태로도 사용이 가능
 * 그렇기때문에 Tomcat 같은 WAS와 함께 기동이 될 수도 있고, 하나의 JVM에서 Tomcat 서비스와 Vert.x 서비스를 같이 수행하는 형태도 가능
   > e.g. 일반적인 HTTP Request는 Tomcat으로 처리하고, SocketIO나 WebSocket과 같은 Concurrent connection이 많이 필요한 Request는 Vert.x 모듈을 이용해서 처리하게 구성 가능
-* 이와같은 유연함때문에 얻는 장점이 큰데 후술예정.
+
+6. Vert.x is a full solution, TCP, HTTP server, routing, even WebSocket
 
 > Ref
 > * https://d2.naver.com/helloworld/163784
@@ -71,7 +71,7 @@
 * 강력한 격리 원칙
   * 일반 클래스 객체와 달리, actor 에는 상태를 조회할 수 있는 어떠한 public api 가 없어 actor 간 상태 공유가 불가능하다.
   * 상태 공유 없이, 메시지를 통해 상호작용하므로 서로 완벽하게 독립적이며, 코드의 응집성(coherenece), 느슨한 결합(loosely coupled), 캡슐화(encapsulation) 보장
-  * 위와 같은 특징은 데드락이나 락에 대한 고민을 없애주기 때문에 병행 처리 코드를 보다 쉽게 구현할 수 있도록 도와준다.
+  * 위와 같은 특징은 데드락이나 락에 대한 고민을 없애주기 때문에 병렬 처리 코드를 보다 쉽게 구현할 수 있도록 도와준다.
 * 경량
   * 각 엑터 인스턴스는 수백 바이트만 소비하므로 단일 응용 프로그램에 수백개의 액터를 동시 생성 가능
   
@@ -142,7 +142,11 @@
 ### [Popularity](https://stackshare.io/stackups/ratpack-vs-vert-x-vs-akka)
 <img width="858" alt="image" src="https://user-images.githubusercontent.com/48702893/188261415-948989c4-de13-4748-86d6-de92a48724c1.png">
 
-### Spring Webflux vs Vert.x
+### [Trends](https://trends.google.com/trends/explore?q=akka,vertx)
+<img width="1172" alt="image" src="https://user-images.githubusercontent.com/48702893/196204495-acbd5059-88db-4947-9c82-48f41a927460.png">
+
+
+### Spring Webflux vs Vert.x(Akka)
 #### Microservices
 * MSA 환경에서, vert.x 는 verticle 및 vert.x 인스턴스들이 독립적으로 동작하며 event-bus 로만 상호 작용하므로, Component 간 loosely coupled 되어있다 할 수 있다
 * 따라서 vert.x 는 event-bus 를 사용하는 어떠한 JVM 기반 언어의 컴포넌트와도 함께 동작 할 수 있다.
@@ -165,6 +169,10 @@
   2. The executeBlocking call in Vert.x Core.
   3. Using a completely separate Verticle called a Worker Verticle which runs in a defined set of thread pools.
 
+#### Polyglot
+* vert.x 는 polyglot 언어로서, 다양한 프로그래밍 언어와 함께 사용할 수 있을 뿐만 아니라, 라이브러리 형태로도 사용가능해, 어떠한 웹서버와도 함께 사용될 수 있다.
+* 그에반해, Spring webflux 는 JVM 기반의 언어(java, kotlin) 에만 사용 가능하고, 구동되는 웹서버에도 제약이 존재한다(Netty, Tomcat, Jetty, Undertow, and Servlet 3.1+ containers) 
+
 #### Performance
 * 그리고 무엇보다, benchmark 에서도 알 수 있듯이, Vert.x 가 Webflux 보다 성능이 좋다
 * 하지만 Webflux 는 성능은 다소 떨어진다 해도, 거대한 커뮤니티를 형성하고 있고 레퍼런스또한 방대하다. 게다가 지원하는 써드파티모듈 또한 다양하다.
@@ -175,11 +183,42 @@
 > * https://blog.rcode3.com/blog/vertx-vs-webflux/
 > * https://stackoverflow.com/questions/47711528/spring-webflux-vs-vert-x
 
-### Spring Webflux vs Akka
-* TBU
-
 ### Akka vs Vert.x
-* TBU
+* Akka, Vert.x 모두 리액티브를 지향하고 있는 점이나, 이벤트(메시징) 루프식의 스택도 그렇고, verticle 이나 actor와 같이 공유 데이터 없는 독립적인 개체로 동작하는 등 여러 공통점이 많음
+* 그럼에도 몇가지 중요한 차이가 존재하며 이들을 스택 선택시 판단기준으로 사용
+
+#### Elastic
+* Vert.x 는 위에서도 설명했듯, polyglot language이다. 다양한 언어로 개발될 수 있고, Event bus 를 통해 서로 다른 언어로 개발된 verticle 들을 하나의 애플리케이션처럼 동작할 수도 있다.
+* 또한, 라이브러리 형태로 필요한 부분에만 선택적으로 사용할 수도 있기에, 다른 WAS 프레임워크나 비동기 프레임워크, 심지어 Akka 와도 함께 쓰일 수 있다.
+* 이와같은 특징들덕에 다순힌 유연해지는것 뿐만 아니라, 서비스를 구성하는 모듈간 의존성을 해소하고 decoupling 시킬 수 있다.
+* 반면에, Akka 는 scala나 java object 포맷의 메시지로 actor 간 통신하므로 java 또는 Scala 로만 개발 될 수 있다.
+
+#### Fault tolerant & Delivery Guarantees
+* Akka actor 하나의 actor 에서 자식 actor 를 가지며 supervisor 역할을 함으로서 트리형 계층 구조를 형성한다. [[ref]](https://getakka.net/articles/concepts/actor-systems.html#hierarchical-structure)
+* 이를통해, actor 계층의 level 별로 actor 가 Handling 할 error를 따로 가져갈 수 있으며, 자식 actor 는 자신이 handling 할 수 없는 error 인경우 parent actor 로 전파하여 처리를 위임한다.
+* 이를통해 에러 handling 을 계층별로 구조적이면서도 유연하게 가져갈 수 있다.
+
+![image](https://user-images.githubusercontent.com/48702893/196196243-f82562ae-6782-4a8a-b26c-ff68336018f0.png)
+
+* 또한 Akka 는 [akka persistence](https://doc.akka.io/docs/akka/current/typed/persistence.html#introduction) 를 통해, actor 가 예기치 못한 상황으로 shutdown 되었다가 다시 restart 되었을떄 shutdown 되기 전 actor 의 상태로 자동으로 recover 해준다.
+* 이를 통해, 메시지의 At-most-once 전달 뿐만 아니라 At-lease-once 전달 또한 보장한다.
+* 반면에 Vert.x 는 verticle 들이 단일 계층만을 형성할 수 있어 하나의 Verticle 에서 발생가능한 모든 예외상황을 handling 해야한다.
+* 또한 Vert.x 는 Akka persistence 같은 자동 recover 기능을 지원하지 않아, 메시지의 At-lease-once 전달을 보장하지 못한다.
+
+#### Support
+* Akka 는 Lightbend 의 Reactive Platform 으로서 개발 및 유지보수 되고있다. 기업내에서 체계적으로 관리되기때문에 지원도 많고 기술적으로도 더 성숙하다 할 수 있겠다.
+* 지원하는 기능도 매우 다양한데 kafka, cassandra, grpc 등의 integration을 손쉽게 도와주는 alpakka 라이브러리를 포함하여 다양한 dbms, mq, 프로토콜등을 지원한다.
+* 이렇게 다양한 서드파티 지원을 포함하여 fault-tolerance, resilience, actors 구조, event-sourcing 을 통해 대용량 트래픽을 처리하는 대규모 분산 비동기 시스템에 적용하기에 적합
+
+#### Learning curve
+* Akka 는 다양한 서드파티 라이브러리 및 기능을 지원하기때문에 강력하나 러닝커브가 높음
+* 그에반해 Vert.x 는 더 가볍고 구조가 심플하며 유연하여 러닝커브가 낮고 다양한 용도로 빠르게 적용 가능해 생산성이 높다.
+
+> Ref
+> * https://glqdlt.tistory.com/357
+> * https://hamait.tistory.com/218
+> * https://qimia.io/en/blog/Akka-Actors-vs-Vert-x-Core
+> * https://www.quora.com/Among-Vert-x-and-Akka-which-toolkit-do-you-prefer-in-development-and-why
 
 <br>
 
@@ -194,9 +233,8 @@
 * Junit 에 연동되는 자체 테스트 라이브러리를 별도로 제공하여 테스트 작성이 쉽다
 
 ### 단점
-* Java 8로 개발되어있음...
-* Netty의 사용성 정도만 개선한걸로 보이며 따로 Ratpack 만의 기술이 있어보이진 않음.
-* 그에따라 기본 아키텍쳐도 Netty 나 Node.js 와 거의 동일하며 이들에 비해 성능적으로 뛰어난부분이 안보임
+* Java 8로 개발되어있음
+* 사용자가 적고 커뮤니티가 작음
 
 > Ref
 > * https://www.moreagile.net/2016/01/ratpack.html
