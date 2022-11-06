@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1667729241278" clover="4.4.1">
+   <project name="CoverageMeasureToolsComparison 1.0-SNAPSHOT" timestamp="1667729238461">
+      <metrics coveredelements="5" complexity="3" loc="15" methods="1" classes="1" statements="6" packages="1" coveredconditionals="1" coveredmethods="1" elements="11" ncloc="14" files="1" conditionals="4" coveredstatements="3"/>
+      <package name="default-pkg">
+         <metrics coveredelements="5" complexity="3" loc="15" methods="1" classes="1" statements="6" coveredconditionals="1" coveredmethods="1" elements="11" ncloc="14" files="1" conditionals="4" coveredstatements="3"/>
+         <file path="/Users/user/Desktop/Personal/Project/CoverageMeasureToolsComparison/src/main/java/SampleClass.java" name="SampleClass.java">
+            <metrics coveredelements="5" coveredconditionals="1" complexity="3" loc="15" coveredmethods="1" methods="1" elements="11" classes="1" ncloc="14" statements="6" conditionals="4" coveredstatements="3"/>
+            <class name="SampleClass">
+               <metrics coveredelements="5" coveredconditionals="1" complexity="3" coveredmethods="1" methods="1" elements="11" statements="6" conditionals="4" coveredstatements="3"/>
+            </class>
+            <line complexity="3" visibility="public" signature="sampleMethod(String,List&lt;Integer&gt;) : void" num="5" count="1" type="method"/>
+            <line num="6" count="1" type="stmt"/>
+            <line falsecount="0" truecount="1" num="6" type="cond"/>
+            <line num="7" count="1" type="stmt"/>
+            <line num="8" count="1" type="stmt"/>
+            <line num="9" count="0" type="stmt"/>
+            <line falsecount="0" truecount="0" num="9" type="cond"/>
+            <line num="10" count="0" type="stmt"/>
+            <line num="12" count="0" type="stmt"/>
+         </file>
+      </package>
+   </project>
+   <testproject name="CoverageMeasureToolsComparison 1.0-SNAPSHOT" timestamp="1667729238461">
+      <metrics coveredelements="2" complexity="1" loc="29" methods="1" classes="1" statements="1" packages="1" coveredconditionals="0" coveredmethods="1" elements="2" ncloc="11" files="1" conditionals="0" coveredstatements="1"/>
+      <package name="default-pkg">
+         <metrics coveredelements="2" complexity="1" loc="29" methods="1" classes="1" statements="1" coveredconditionals="0" coveredmethods="1" elements="2" ncloc="11" files="1" conditionals="0" coveredstatements="1"/>
+         <file path="/Users/user/Desktop/Personal/Project/CoverageMeasureToolsComparison/src/test/java/SampleClassTest.java" name="SampleClassTest.java">
+            <metrics coveredelements="2" coveredconditionals="0" complexity="1" loc="29" coveredmethods="1" methods="1" elements="2" classes="1" ncloc="11" statements="1" conditionals="0" coveredstatements="1"/>
+            <class name="SampleClassTest">
+               <metrics coveredelements="2" complexity="1" methods="1" testruns="1" statements="1" coveredconditionals="0" coveredmethods="1" elements="2" testfailures="0" testduration="0.003" conditionals="0" coveredstatements="1" testpasses="1"/>
+            </class>
+            <line complexity="1" visibility="public" signature="sampleMethod() : void" num="10" testsuccess="true" count="1" testduration="0.003" type="method"/>
+            <line num="12" count="1" type="stmt"/>
+         </file>
+      </package>
+   </testproject>
+</coverage>

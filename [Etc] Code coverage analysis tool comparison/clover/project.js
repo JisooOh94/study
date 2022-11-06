@@ -1,0 +1,2 @@
+processClover (  {"children":[""],"name":"Clover database 일 11월 6 2022 19:07:17 KST","stats":{"AvgMethodComplexity":3,"Complexity":3,"ErroneousTests":0,"FailingTests":0,"FilteredElements":0,"PassingTests":0,"PcErroneousTests":-1,"PcFailingTests":-1,"PcPassingTests":-1,"TestExecutionTime":0,"Tests":0,"TotalChildren":1,"TotalPercentageCovered":45.454548,"TotalStatements":6,"UncoveredElements":6},"title":"CoverageMeasureToolsComparison 1.0-SNAPSHOT"}
+ ); 
