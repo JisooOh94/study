@@ -557,25 +557,7 @@ jisoooh     7    50860   428140   431153   437188
 83584 jisoooh -bash                              0     2520     2617     3380 
 ```
 
-<br>
-
-# CPU
-## mpstat
-* CPU 사용률을 CPU 별로 출력... 사실상 무쓸모
-```shell
-$ mpstat -P ALL 1
-Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015  _x86_64_ (32 CPU)
-
-07:38:49 PM  CPU   %usr  %nice   %sys %iowait   %irq  %soft  %steal  %guest  %gnice  %idle
-07:38:50 PM  all  98.47   0.00   0.75    0.00   0.00   0.00    0.00    0.00    0.00   0.78
-07:38:50 PM    0  96.04   0.00   2.97    0.00   0.00   0.00    0.00    0.00    0.00   0.99
-07:38:50 PM    1  97.00   0.00   1.00    0.00   0.00   0.00    0.00    0.00    0.00   2.00
-07:38:50 PM    2  98.00   0.00   1.00    0.00   0.00   0.00    0.00    0.00    0.00   1.00
-07:38:50 PM    3  96.97   0.00   0.00    0.00   0.00   0.00    0.00    0.00    0.00   3.03
-[...]
-```
-
-<br>
+가<br>
 
 # Disk
 ## iostat
@@ -749,66 +731,10 @@ auto
 
 <br>
 
-# ETC
-## uptime
-* 서버 구동 시간 및 접속해있는 사용자수, load average 값 출력(모두 top 명령어로 확인 가능)
-```shell
-$ uptime
-23:51:26 up 21:31, 1 user, load average: 30.02, 26.43, 19.02
-```
-
-<br>
-
-# dmesg | tail
-* os레벨의 오류(segfault, oom 등) 메세지 확인
-* 부팅시부터 시작해서 모든 커널메세지가 출력되기 때문에 tail을 이용해서 마지막 10줄만 출력하는식으로 사용
-```shell
-$ dmesg | tail
-[1880957.563150] perl invoked oom-killer: gfp_mask=0x280da, order=0, oom_score_adj=0
-[...]
-[1880957.563400] Out of memory: Kill process 18694 (perl) score 246 or sacrifice child
-[1880957.563408] Killed process 18694 (perl) total-vm:1972392kB, anon-rss:1953348kB, file-rss:0kB
-[2320864.954447] TCP: Possible SYN flooding on port 7001. Dropping request.  Check SNMP counters.
-```
-
-<br>
-
-# pidstat 1
-* top과 출력하는 데이터가 동이라한, 지속적으로 변화하는 상황을 실시간으로 출력해주기 떄문에, 상황변화 파악에 용이
-```shell
-$ pidstat 1
-Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU)
-
-07:41:02 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
-07:41:03 PM     0         9    0.00    0.94    0.00    0.94     1  rcuos/0
-07:41:03 PM     0      4214    5.66    5.66    0.00   11.32    15  mesos-slave
-07:41:03 PM     0      4354    0.94    0.94    0.00    1.89     8  java
-07:41:03 PM     0      6521 1596.23    1.89    0.00 1598.11    27  java
-07:41:03 PM     0      6564 1571.70    7.55    0.00 1579.25    28  java
-07:41:03 PM 60004     60154    0.94    4.72    0.00    5.66     9  pidstat
-
-07:41:03 PM   UID       PID    %usr %system  %guest    %CPU   CPU  Command
-07:41:04 PM     0      4214    6.00    2.00    0.00    8.00    15  mesos-slave
-07:41:04 PM     0      6521 1590.00    1.00    0.00 1591.00    27  java
-07:41:04 PM     0      6564 1573.00   10.00    0.00 1583.00    28  java
-07:41:04 PM   108      6718    1.00    0.00    0.00    1.00     0  snmp-pass
-07:41:04 PM 60004     60154    1.00    4.00    0.00    5.00     9  pidstat
-```
-
-<br>
-
-
-
-<br>
-
-# ping
-* 대상 호스트(호스명 or IP주소)로 ICMP(Internet Control Message Protocol)을 전송하여 대상 호스트에 연결이 되어있는지 확인 가능
-
-<br>
-
-# netstat
-* TCP-IP 커넥션 네트워크의 통계 정보 출력 
-* 열려있는 포트와 동작하고 있는 소프트웨어도 확인할 수 있다.
+# Network
+## netstat
+* TCP-IP 커넥션 네트워크의 통계 정보 출력
+* 열려있는 포트와 동작하고 있는 소프트웨어 확인 가능
 * 네트워크 connection 상태, 라우팅테이블, 인터페이스 통계 정보 등을 출력
 
 ### Columns
@@ -845,15 +771,75 @@ Linux 3.13.0-49-generic (titanclusters-xxxxx)  07/14/2015    _x86_64_    (32 CPU
 * l : LISTEN인 상태만 표시
 * c : 1 초 단위로 반복해서 출력
 
-e.g. 
-netstat -anp : 열려있는 모든 포트 출력
-netstat -anp | grep LISTEN : listen 되는 모든 포트 출력
+> e.g.
+> * netstat -anp : 열려있는 모든 포트 출력
+> * netstat -anp | grep LISTEN : listen 되는 모든 포트 출력
 
 <br>
 
-# traceroute
+## traceroute
 * 지정된 호스트까지 패킷이 전달되는 경로 출력
-* ping이 날라가지 않을 경우, traceroute을 통해 호스트 자체에 문제가 있는지, 호스트에 도달하기까지 네트워크 경로중에 문제가 있는지 알아볼 수 있다.
+* ping이 날라가지 않을 경우, traceroute을 통해 호스트 자체에 문제가 있는지, 호스트에 도달하기까지 네트워크 경로중에 문제가 있는지 알아볼 수 있음
+* 최대 30홉까지만 출력하며 ICMP패킷 송수신을 막아놓았거나 우선순위를 낮춰둔 홉을 마주칠경우 경로 추적 실패할 수 있고 * 로 표시됨
+
+```java
+[~]$ traceroute www.naver.com
+traceroute to www.naver.com (23.60.108.213), 30 hops max, 60 byte packets
+ 1  gateway (10.241.0.1)  0.083 ms  0.069 ms  0.063 ms
+ 2  10.231.1.91 (10.231.1.91)  0.244 ms  0.355 ms  0.380 ms
+ 3  10.231.0.8 (10.231.0.8)  0.354 ms 10.231.0.9 (10.231.0.9)  0.334 ms 10.231.0.8 (10.231.0.8)  0.328 ms
+ 4  10.231.0.12 (10.231.0.12)  0.293 ms 10.231.0.7 (10.231.0.7)  0.294 ms  0.505 ms
+ 5  10.231.2.37 (10.231.2.37)  0.573 ms 10.231.2.45 (10.231.2.45)  0.442 ms 10.231.2.33 (10.231.2.33)  0.662 ms
+ 6  10.231.2.13 (10.231.2.13)  0.575 ms  0.456 ms 10.231.2.1 (10.231.2.1)  0.515 ms
+ 7  10.128.2.221 (10.128.2.221)  0.381 ms 10.128.2.193 (10.128.2.193)  0.284 ms 10.128.2.221 (10.128.2.221)  0.362 ms
+ 8  * * *
+ 9  * * *
+10  * * *
+11  * * *
+12  * * *
+13  * * *
+14  * * *
+15  * * *
+16  * * *
+17  * * *
+18  * * *
+19  * * *
+20  * * *
+21  * * *
+22  * * *
+23  * * *
+24  * * *
+25  * * *
+26  * * *
+27  * * *
+28  * * *
+29  * * *
+30  * * *
+```
+
+<br>
+
+# ETC
+## 프로세스 시작 시간
+* ps -eo pid,lstart,cmd | grep 프로세스명 | grep -v grep
+```shell
+[root@zetawiki ~]# ps -eo pid,lstart,cmd | grep crond | grep -v grep
+3310 Thu Nov 21 01:36:12 2013 crond
+```
+
+<br>
+
+## dmesg | tail
+* os레벨의 오류(segfault, oom 등) 메세지 확인
+* 부팅시부터 시작해서 모든 커널메세지가 출력되기 때문에 tail을 이용해서 마지막 10줄만 출력하는식으로 사용
+```shell
+$ dmesg | tail
+[1880957.563150] perl invoked oom-killer: gfp_mask=0x280da, order=0, oom_score_adj=0
+[...]
+[1880957.563400] Out of memory: Kill process 18694 (perl) score 246 or sacrifice child
+[1880957.563408] Killed process 18694 (perl) total-vm:1972392kB, anon-rss:1953348kB, file-rss:0kB
+[2320864.954447] TCP: Possible SYN flooding on port 7001. Dropping request.  Check SNMP counters.
+```
 
 ***
 > Reference
