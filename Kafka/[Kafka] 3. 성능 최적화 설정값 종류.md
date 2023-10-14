@@ -26,6 +26,12 @@
     * 너무 길게 설정하면, bath.size 만큼 메시지가 축적되길 대기하는 시간이 너무 길어지므로 일부 메시지의 producing 이 지연될 수 있다.
     * 일반적으로, 지연과 네트워크 비용사이에 적절히 타협하여 10 또는 100 으로 설정
     * default : 0
+* buffer.memory
+    * 메시지를 축적하는 Accumulator 버퍼 크기
+    * 너무 작게 설정하면, 버퍼가 가득 차있는 상황이 자주 발생한다. 메시지 produce 요청시 버퍼가 가득 차있으면 max.block.ms 만큼 대기한후 exception 이 발생하기때문에 메세지가 유실된다.
+    * 너무 크게 설정하면, 잉여 메모리가 많아져 리소스를 낭비하게 된다.
+    * 어플리케이션에서 전송하는 메시지 평균 크기, batch.size 값을 기반으로 설정한다.
+    * default : 33554432 byte
 * compression.type
     * 메시지 압축 포맷 설정. none, gzip, snappy 등
     * default : none
