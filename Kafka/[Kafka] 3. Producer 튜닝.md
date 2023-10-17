@@ -86,12 +86,34 @@
   * max.in.flight.requests.per.connection 이 1 일경우, 첫번째 메시지 전송 후, 전송 선공시에만 두번쨰 메시지를 전송
   * max.in.flight.requests.per.connection 이 2 이상일 경우, 한번에 첫번쨰,두번쨰 메시지 모두 전송
 * max.in.flight.requests.per.connection 이 2 이상일때, 
+  ![image](https://github.com/JisooOh94/study/assets/48702893/3cce36a6-8e2c-4b80-8643-7b9b4a14a9d3)
   1. producer 에서 첫번쨰, 둣번쨰 메시지를 브로커로 전송한다.
   2. 브로커에선 두 메시지 모두 enqueue 하고(혹은 두번쨰 메시지만 enqueue 한 상태에서 브로커에 이슈발생, max.in.flight.requests.per.connection 값에 따라 동시에 메시지를 전송하기때문에 타이밍상 두번째 메시지가 먼저 도달할 수 있다.) producer 로 ack 를 전송한다.
   3. 이때, 네트워크 이슈등으로 두번쨰 메시지에 대한 ack 만 producer 로 전달되고, 첫번째 메시지에 대한 ack 는 전달되지 못한다.
   4. producer 는 첫번째 메시지의 프로듀싱이 실패했다 판단하고 첫번쨰 메시지 프로듀싱을 재시도한다.
   5. 이때, 2번과정에서 브로커에 첫번째 메시지도 enqueue 되어있었다면 중복 producing 되는것이고, enqueue 되어있지 않았다면 두번째 메시지와 순서가 바뀌어 producing 되는것이다.
 * 따라서, retries 가 0이 아닐때 메시지 전송 순서를 보장하려면 max.in.flight.requests.per.connection 을 1로 설정해야한다. 하지만 이럴경우, 동시성이 떨어져 메시지 전송 속도가 느려진다
+* kafka 에서는 위와같은 문제를 해결하기 위해 EOS(Exactly once semantics) 를 보장하는 멱등 프로듀서(Idempotent producer) 를 지원한다.
+
+### 멱등 프로듀서(Idempotent producer)
+* Kafka 는 기본적으로 최소 한번의 메시지 전송은 보장 하는 At Least Once Delivery 정책이었다. 
+  * 프로듀서에서 메시지가 전송되었다는 ack를 받지 못할 경우 retry send를 하는 방법으로 최소 1회의 전송을 보장 
+* 하지만 0.11 버전부터 정확히 한번만 메시지 전송을 보장(exactly once delivery) 하기 위해 idempotent producer가 추가되었다.
+* idempotent producer 동작 방식
+  * 프로듀서에서 메시지 프로듀싱시, 메시지 헤더에 producer id, sequence number 를 추가하여 브로커로 전송
+    * producer id : 각 프로듀서가 가지는 고유한 세션 id
+    * sequence number : 파티션별 메시지에 부여되는 순차적으로 증가하는 sequence number
+  * 브로커에선 파티션 - producer id 별로 sequnce number 를 메모리에 저장. 메시지 수신시 메시지의 producer id, sequence number 가지고 이미 프로듀싱된 메시지인지 식별
+* 멱등 프로듀서 적용
+  * kafka 3.0 부턴 default 로 멱등 프로듀서가 활성화 되어있으나, 2.8 버전 이하에선 직접 설정해주어야 한다. 
+  * enable.idempotence : true(enable.idempotence 가 true 일때, 아래의 조건들이 만족되지 않으면 config exception throw)
+  * acks : all(-1)
+  * max.in.flight.requests.per.connection : 5 이하 (도잇성을 최대로 하여 성능을 극대화하기 위해 최대값인 5로 설정하는것이 좋음)
+  * retries : MAX_INT(enable.idempotence 를 true 로 설정하면 retries 는 자동으로 MAX_INT 로 설정됨)
+
+
+### 멱등 컨슈머
+* TBU
 
 > Reference
 > * https://ohjongsung.io/2020/01/04/%EC%B9%B4%ED%94%84%EC%B9%B4-%ED%8A%9C%EB%8B%9D-%EB%B0%A9%EC%95%88-%EC%A0%95%EB%A6%AC
@@ -101,3 +123,6 @@
 > * https://d2.naver.com/helloworld/6560422
 > * https://velog.io/@xogml951/Apache-Kafka
 > * https://velog.io/@xogml951/Kafka%EC%99%80-Exactly-Once
+> * https://4betterme.tistory.com/177
+> * https://bistros.tistory.com/entry/Kafka-idempotent-producer-%EB%A9%B1%EB%93%B1%EC%84%B1%EC%97%90-%EA%B4%80%ED%95%B4%EC%84%9C
+> * https://blog.naver.com/PostView.naver?blogId=fbfbf1&logNo=223101741560&categoryNo=84&parentCategoryNo=37&viewDate=&currentPage=1&postListTopCurrentPage=1&from=postView
