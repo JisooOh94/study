@@ -2,21 +2,15 @@
 
 ![image](https://user-images.githubusercontent.com/48702893/149144910-d9f5199a-575c-4fe6-8187-c3a0cdc3f6f7.png)
 
-* Producer - Broker - Consumer 로 구성
+* Producer - kafka Cluster(Broker) - Consumer 로 구성
 	* Producer 에서 메시지 생성하여 Broker 로 전송
 	* Broker 에 메시지가 저장되어있으면, Consumer 가 메시지 읽어 처리
 * pub-sub 구조 메시지 큐
 	* publisher 가 메시지 발행시, 그를 구독한 subscriber 가 메시지 소비(정해진 subscriber 에게 메시지를 전송 X)
 	* publisher 는 subscriber 에 대한 정보 없이 메시지만 발행하고, subscriber 도 publisher에 대한 정보 없이 메시지 소비 가능
-	* 발행자와 구독자의 디커플링을 통해 가용성 및 확장성 증대 
-
-### zookeeper
-* 연결되어있는 kafka 클러스터, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보 저장 관리 
-* 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
-* zookeeper 도 여러대의 서버를 묶은 클러스토 관리되며, 하나의 zookeeper 클러스터가 여러개의 kafka cluster 관리 가능
-	* 각 kafka cluster 의 메타정보를 저장하는 디렉토리만 구분해주면 됨
+	* 발행자와 구독자의 디커플링을 통해 가용성 및 확장성 증대
 	
-### producer
+### 1. producer
 * 크게 Accumulator, Sender로 구성
 * Accumulator
 	* 전송 요청되는 메시지들을 모아두는 버퍼, 저장공간
@@ -34,33 +28,40 @@
 
 ![image](https://user-images.githubusercontent.com/48702893/153410414-f6ceec63-e151-4da7-b8ce-9bda37657bf0.png)
 
-### broker
-* 카프카 서버, 메세지 큐 저장 및 관리 수행
-* 확장성 및 고가용성을 위해 여러개의 broker 를 묶은 Kafka cluster 로 관리됨
-* Producer 에서 메시지 전송시, round-robin 방식으로 클러스터내의 broker 들에게 공평하게 할당
-* Kafka cluster 의 브로커들중 하나를 컨트롤러 브로커로 선정하여 클러스터 내 브로커 관리 수행
-	* 브로커 상태 체크
-	* 브로커 사망시, 브로커의 파티션을 리더 파티션으로 사용하던 토픽의 리더 파티션 재 선출
-	* 각 브로커에 파티션 분배
+### 2. broker
+* 카프카 서버로서 확장성 및 고가용성을 위해 여러개의 broker(최소 3개 이상 권장) 를 묶은 Kafka cluster 로 구성됨
+* Producer 로부터 수신한 메세지 저장 및 관리 수행
+* Producer 에서 메시지 전송시, round-robin 방식으로 Kafka cluster 내 broker 들에게 공평하게 할당
+* zookeeper 가 Kafka cluster 의 브로커들중 하나를 컨트롤러 브로커로 선정하여 클러스터 내 브로커 관리 수행 위임
 
-### topic
+#### Controller broker
+* 토픽 생성시, 설정된 파티션 수에 맞춰 각 브로커에 파티션 분배
+* Kafka cluster 내 브로커들의 h/c 수행. h/c 에 실패한 브로커 발견시 failover 수행
+  * 해당 브로커의 파티션을 리더 파티션으로 사용하던 토픽들의 리더 파티션 재 선출
+  * 재 선출된 리더 파티션들의 정보를 zookeeper 에 저장
+  * ![image](https://github.com/JisooOh94/study/assets/48702893/133d684a-b565-4d9a-bf7b-bf8f38f03a5b)
+* Controller broker 의 h/c 는 zookeeper 가 수행. h/c 실패시 zookeeper 에서 controller broker 재선출 
+
+#### topic
 * 메시지 구분을 위한 타이틀 개념
-* topic 생성시, zookeeper 에 정보가 저장되며, 해당 topic 의 메시지를 처리할 kafka cluster 를 zookeeper 가 설정
+* topic 생성시, 설정한 파티션 개수등의 정보가 zookeeper 에 저장되며, 해당 topic 의 메시지를 처리할 kafka cluster 또한 zookeeper 가 설정
 * topic 단위로 kafka cluster, consumer group 이 묶임
 
-### partition
+#### partition
 * 메시지가 저장되는 메시지 큐
 * 하나의 토픽당 여러개의 파티션이 생성될 수 있으며, 각 파티션은 kafka cluster 내의 브로커들에게 골고루 나뉘어 저장 및 관리됨
-	* zookeeper 에서 설정한 controller 브로커가 파티션 분배 작업 수행
+    * zookeeper 에서 설정한 컨트롤러 브로커가 파티션 분배 작업 수행
+* 각 브로커에 분배된 파티션들은 리더 파티션이되고, 브로커의 replication factor 설정값에 따라 각 리더 파티션들의 replica 파티션도 함께 생성된다.
+* <img width="752" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/978150ce-857a-4f0a-ac56-849cde1d9f6c">
 * 파티션에 저장되는 각 메시지는 offset 이라는 1씩 증가하는 index 값을 가지게 되며, 이 offset 으로 파티션 내 메시지 식별 가능
 * producer 가 메시지 전송시, 메시지는 해당 토픽의 파티션들에 round-robin 방식으로 골고루 저장되게 되며, 이를 통해 broker 에도 부하가 골고루 분산되게됨
 * 하나의 파티션 내의 메시지간에는 LIFO 를 보장하나, 여러 파티션간 메시지는 LIFO 를 보장하지 않음
-	* 메시지가 프로듀스 된 시간 순서에따라 처리가 되어야한다면, 토픽의 메시지를 하나의 파티션에만 프로듀싱하도록 파티션 고정 가능
+    * 메시지가 프로듀스 된 시간 순서에따라 처리가 되어야한다면, 토픽의 메시지를 하나의 파티션에만 프로듀싱하도록 파티션 고정 가능
 * 토픽의 파티션 추가는 런타임시점에도 자유롭게 가능하나, 파티션 제외는 불가능(토픽 삭제 후 재생성으로만 가능)
 
 ![image](https://user-images.githubusercontent.com/48702893/149141998-24c29f47-c66d-4534-810c-3aae65f65cae.png)
 
-### consumer
+### 3. consumer
 * 파티션에 저장되어있는 메시지를 소비해가 처리를 수행하는 주체
 * consumer 또한 마찬가지로 여러개의 consumer 를 묶은 consumer group 으로 관리되며, 토픽은 consumer group 단위로 구독됨
 	* 하나의 토픽을 여러개의 consumer group 이 구독 가능
@@ -80,6 +81,15 @@
     	* 클경우 : 처리된 offset과 commit 된 offset 사이의 모든 메시지 누락      
 	
 ![image](https://user-images.githubusercontent.com/48702893/149145169-80291447-9b7e-45e0-a62a-b46fdd111892.png)	
+
+### 4. zookeeper
+* 연결되어있는 kafka 클러스터의 식별정보, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보 저장 관리
+* 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
+* zookeeper 도 가용성을 위해 여러대의 zookeepr 서버를 묶은 클러스터로 구성이 가능
+  * 하나의 leader zookeeper - 나머지 follower zookeeper 로 구성
+  * 변경사항이 leader zookeeper 에 먼저 반영되면 나머지 follower zookeeper 들이 동기하는 방식으로 동작 
+* 하나의 zookeeper 서버로 여러개의 kafka cluster 관리 가능
+    * 각 kafka cluster 의 메타정보는 kafka cluster 구성시 브로커의 zookeeper.connect 에 설정한 경로 하위에 저장됨. 따라서 해당 디렉토리만 다르게 해주면 여러개의 kafka cluster 를 하나의 zookeeper 에 연결가능
 
 ***
 > Reference
