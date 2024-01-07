@@ -52,16 +52,8 @@
         * 리더 파티션에 메시지 저장 성공시 성공으로 판단. 리더 파티션은 팔로워 파티션들의 메시지 저장 성공 여부 상관없이 ACK 응답 전송
         * 처리량과 내구성 사이에서 적절한 타협을 본, (보편적 용도에서) 가장 합리적인 설정 값
     * all / -1
-        * 리더 파티션 및 팔로워 파티션(ISR) 모두에 메시지 저장 성공시 성공으로 판단. 리더 파티션은 팔로워 파티션으로부터 ack 응답 수신 후 ack 응답 전송
+        * 리더 파티션 및 토픽의 min.insync.replicas 수만큼 팔로워 파티션에 메시지 저장 성공시 성공으로 판단. 리더 파티션은 팔로워 파티션으로부터 ack 응답 수신 후 프로듀서로 ack 응답 전송
         * 높은 내구성 보장하나 쓰르풋 및 레이턴시 많이 떨어짐
-* min.insync.replicas
-  * 프로듀싱에 성공했다고 판단하기 위한 최소 리플리케이션 팩터
-  * acks 가 all 일경우, 브로커는 리더 파티션 프로듀싱 + 팔로워 파티션 동기화 가 모두 되어야 프로듀서로 ack 를 응답한다. 
-  * 이때, 최소 몇개의 팔로워 파티션에 동기화가 되어야지 ack 를 응답할지 판단하는 값
-  * 브로커의 replication factor 값보다 작아야하고, 일반적으로 replication factor 보다 1 ~ 2 정도 작은 값으로 설정하는것이 좋다.
-    * 팔로워 파티션의 목적은, (리더든, 팥로워든)파티션중 하나에 장애가 발생하더라도 문제없이 서비스가 돌아가게 하기 위함이다(fault tolerance)
-    * min.insync.replicas 가 replication factor 와 동일할경우, 리더 파티션 뿐만 아니라 모든 팔로워 파티션에까지 동기화가 되어야 프로듀싱 성공으로 판단한다.
-    * 즉, 팔로워 파티션중 하나에 장애가 발생할경우, 모든 프로듀싱이 실패하고, 서비스가 정상적으로 동작하지 않게 된다.
 
 * retries
     * 메시지 전송 실패시, 재시도 횟수
@@ -135,3 +127,5 @@
 > * https://4betterme.tistory.com/177
 > * https://bistros.tistory.com/entry/Kafka-idempotent-producer-%EB%A9%B1%EB%93%B1%EC%84%B1%EC%97%90-%EA%B4%80%ED%95%B4%EC%84%9C
 > * https://blog.naver.com/PostView.naver?blogId=fbfbf1&logNo=223101741560&categoryNo=84&parentCategoryNo=37&viewDate=&currentPage=1&postListTopCurrentPage=1&from=postView
+> * https://devlog-wjdrbs96.tistory.com/436
+> * https://sjparkk-dev1og.tistory.com/207
