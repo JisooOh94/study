@@ -35,12 +35,62 @@
 <img src="https://user-images.githubusercontent.com/48702893/149331939-9259ea2e-18b9-41c8-a8c2-3aa6140a076d.png" width="400" height="200">
 
 # Broker 성능 관련 설정
+### 쓰루풋 관련 설정
+* num.network.threads
+  * 네트워크 통신(요청 수신, 응답 전송)을 처리하는 스레드 수 (default : 3)
+  * 프로듀서, 컨슈머와의 통신량 및 replication factor 값을 고려하여 스레드 수 설정 필요
+  * 카프카에서 제공하는 "kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent" 메트릭(network thread 들이 idle 상태로 대기하는 시간 비율)을 참조하여 num.network.threads 값 튜닝
+    * idle 비율이 30% 이하면 네트워크 스레드 수가 부족한것이다. num.network.threads 값 증가 필요
+* num.io.threads
+  * 요청을 처리하는 스레드 수 (default : 8)
+  * 스레드수를 늘리면 throughput 이 증대될 수 있으나, cpu 자원 및 디스크 대역폭등이 부족하면 스레드수가 많아도 쓰루풋이 bound 될 수 있으므로 이들을 고려하여 늘려야한다.
+  * 일반적으로 disk volume 수와 동일한 값으로 설정하는것을 권장
+  * 카프카에서 제공하는 "kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent" 메트릭(IO thread 들이 idle 상태로 대기하는 시간 비율)을 참조하여 num.io.threads 값 튜닝
+    * idle 비율이 30% 이하면 네트워크 스레드 수가 부족한것이다. num.network.threads 값 증가 필요
+* queued.max.requests
+  * 요청 큐에 저장되어 처리 대기할 수 있는 최대 요청 수 (default : 500)
+  * 큐가 가득차면 네트워크 스레드는 더이상 새로운 요청을 수신하지 않는다.
+  * 요청큐가 지속적으로 가득 차있을때,
+    * 서버의 cpu 리소스, 디스크 대역폭등에 여유가 있다면
+    * 서버의 리소스가 부족하다면 broker 를 추가하여 scale-out 한다.
+* [socket.receive.buffer.bytes](https://kafka.apache.org/documentation/#brokerconfigs_socket.receive.buffer.bytes), [socket.send.buffer.bytes](https://kafka.apache.org/documentation/#brokerconfigs_socket.send.buffer.bytes)
+  * 서버 tcp socket 의 수신/송신 버퍼 크기 (default : 102400 (100 kibibytes))
+  * producer 또는 consumer 와 broker 서버 사이의 네트워크 latency 가 높은경우 socket buffer 크기를 키워 한번에 더 많은 양의 segment 를 송/수신하게 함으로서 어느정도 보완 가능
+  > client-server 간 network latency 는 [BDP(Bandwidth Delay Product)](https://en.wikipedia.org/wiki/Bandwidth-delay_product) 를 측정하여 알 수 있다.
 
-## 파티션 개수
+### 가용성 관련 설정
+* min.insync.replicas
+  * 메시지 프로듀싱 성공으로 응답하기 위해 최소로 요구하는, 리더 파티션에 프로듀싱된 메시지를 복제 성공한 팔로워 파티션 개수 (default: 1)
+  * acks 가 all 일경우, 브로커는 리더 파티션 프로듀싱 + min.insync.replicas 수 만큼의 팔로워 파티션 동기화 가 모두 되어야 프로듀서로 ack 를 응답한다.
+  * 토픽의 replication factor 값보다 작아야하며, 일반적으로 replication factor 보다 1 ~ 2 정도 작은 값으로 설정
+    * 팔로워 파티션의 목적은, (리더든, 팥로워든)파티션중 하나에 장애가 발생하더라도 문제없이 서비스가 돌아가게 하기 위함이다(fault tolerance)
+    * 가용성을 높힌다고 min.insync.replicas 를 replication factor 와 동일한 값으로 설정할경우, 브로커 한대에서만 장애가 발생해도 전체 kafka cluster 장애로 이어져(오히려 가용성 저하) 위험하다.
+      * 리더 파티션 뿐만 아니라 모든 팔로워 파티션에까지 동기화가 되어야 프로듀싱 성공으로 판단
+      * 파티션중 하나에 장애가 발생할경우, min.insync.replicas 를 만족할 수 없고 그로인해 모든 프로듀싱 요청에 실패로 응답
+* default.replication.factor
+  * auto.create.topics.enable 에 의해 자동으로 생성된 topic 에 적용할 replication factor 값 (default : 1)
+    * 수동으로 생성된 topic 은 topci 생성 시점에 replication factor 명시할 수 있다.
+  * replication.factor 를 클러스터의 브로커 서버 수의 배수로 설정하여 각 브로커 서버에 가해지는 부하를 동일하게 유지하는것이 좋다.
+
+### 기타 Broker 설정
+* auto.create.topics.enable
+  * 클라이언트에서 프로듀싱 / 컨슈밍 요청한 토픽이 존재하지 않는 토픽일시, 토픽을 새로 생성할지 여부 (default : true)
+  * 상용 환경에선 미리 생성된 토픽에 대한 요청만 처리하는것이 안전하므로 false 로 설정 권장
+* [message.max.bytes](https://kafka.apache.org/documentation/#brokerconfigs_message.max.bytes)
+  * 브로커가 허용하는 최대 메시지 크기, 이 크기를 넘어가는 메시지(레코드 배치) 프로듀싱 요청은 거절된다.
+  * 카프카 버전이 0.10.2 이전 버전이라면, 본 값 증대시 consumer 의 fetch 가능 최대 메시지 크기 설정값(fetch.max.bytes, max.partition.fetch.bytes) 또한 증대시켜주어야 한다.
+  * topic 별로 별도의 허용 최대 메시지 크기 값을 설정하고 싶다면, max.message.bytes 값 설정
+* [num.replica.fetchers](https://kafka.apache.org/documentation/#brokerconfigs_num.replica.fetchers)
+* [request.timeout.ms](https://kafka.apache.org/documentation/#brokerconfigs_request.timeout.ms)
+
+* [socket.request.max.bytes](https://kafka.apache.org/documentation/#brokerconfigs_socket.request.max.bytes)
+* [connections.max.idle.ms](https://kafka.apache.org/documentation/#brokerconfigs_connections.max.idle.ms)
+
+### 파티션 개수
 * 카프카의 메시지 처리 성능(throughput)은 토픽의 파티션 수, 컨슈머 수에 따라 결정(파티션수, 컨슈머 수를 함께 늘려줘야 성능 증가)
 * 그러나, 파티션수, 컨슈머수를 늘린다고 항상 성능이 좋아지는것이 아님
 
-### 파티션 증대에 따른 trade-off
+#### 파티션 증대에 따른 trade-off
 1. 파일 핸들러 낭비
 * 브로커는 모든 세그먼트 파일(파티션의 메시지 데이터 저장소)의 파일 핸들러(open file handle)를 유지한채로 관리
 * 각 세그먼트 파일은 메시지 데이터 저장파일, 그 데이터의 인덱스 파일 2개로 구성되므로 하나의 파티션당 2개의 파일 핸들러 필요
@@ -64,58 +114,13 @@
 * 파티션의 개수가 많아질수록 프로듀서에 버퍼링되는 메시지 크기도 커지고, OOM 에러 발생 위험 증가
 * 컨슈머 또한, 각 파티션의 메시지를 벌크로 컨슈밍하므로, 파티션 개수가 많아지면, 더 많은 메모리 사용
 
-### 적정 파티션 개수 판단
+#### 적정 파티션 개수 판단
 * 토픽에 대해 초당 프로듀스 되는 메시지 수와 컨슈머 그룹의 각 컨슈머의 메시지 처리 성능에 따라 파티션 개수 및 컨슈머 개수 설정
   * e.g. 메시지 생산 속도가 10rps 인 프로듀서가 4개 있고, 컨슈머의 메시지 처리속도가 5rps 라면, 최소 파티션 8개 - 컨슈머 8개로 구성해야 메시지 펜딩 없이 최상의 throughput 을 낼 수 있다.  
 * 적절한 파티션 수 예측이 어려울 경우, 우선 적은 수의 파티션으로 운용, 운용중 메시지 처리의 병목 발생시 파티션, 컨슈머 늘려가며 튜닝
   * 런타임중, 토픽의 파티션수 증가는 자유롭게 가능하나, 축소는 불가능하므로
 
-## 쓰루풋 관련 설정
-* num.network.threads
-  * 네트워크 통신(요청 수신, 응답 전송)을 처리하는 스레드 수 (default : 3)
-  * 프로듀서, 컨슈머와의 통신량 및 replication factor 값을 고려하여 스레드 수 설정 필요
-  * 카프카에서 제공하는 "kafka.network:type=SocketServer,name=NetworkProcessorAvgIdlePercent" 메트릭(network thread 들이 idle 상태로 대기하는 시간 비율)을 참조하여 num.network.threads 값 튜닝
-    * idle 비율이 30% 이하면 네트워크 스레드 수가 부족한것이다. num.network.threads 값 증가 필요
-* num.io.threads
-  * 요청을 처리하는 스레드 수 (default : 8)
-  * 스레드수를 늘리면 throughput 이 증대될 수 있으나, cpu 자원 및 디스크 대역폭등이 부족하면 스레드수가 많아도 쓰루풋이 bound 될 수 있으므로 이들을 고려하여 늘려야한다.
-  * 일반적으로 disk volume 수와 동일한 값으로 설정하는것을 권장
-  * 카프카에서 제공하는 "kafka.server:type=KafkaRequestHandlerPool,name=RequestHandlerAvgIdlePercent" 메트릭(IO thread 들이 idle 상태로 대기하는 시간 비율)을 참조하여 num.io.threads 값 튜닝
-    * idle 비율이 30% 이하면 네트워크 스레드 수가 부족한것이다. num.network.threads 값 증가 필요
-* queued.max.requests
-  * 요청 큐에 저장되어 처리 대기할 수 있는 최대 요청 수 (default : 500)
-  * 큐가 가득차면 네트워크 스레드는 더이상 새로운 요청을 수신하지 않는다.
-  * 요청큐가 지속적으로 가득 차있을때,
-    * 서버의 cpu 리소스, 디스크 대역폭등에 여유가 있다면
-    * 서버의 리소스가 부족하다면 broker 를 추가하여 scale-out 한다.
-* [socket.receive.buffer.bytes](https://kafka.apache.org/documentation/#brokerconfigs_socket.receive.buffer.bytes), [socket.send.buffer.bytes](https://kafka.apache.org/documentation/#brokerconfigs_socket.send.buffer.bytes)
-  * 서버 tcp socket 의 수신/송신 버퍼 크기 (default : 102400 (100 kibibytes))
-  * producer 또는 consumer 와 broker 서버 사이의 네트워크 latency 가 높은경우 socket buffer 크기를 키워 한번에 더 많은 양의 segment 를 송/수신하게 함으로서 어느정도 보완 가능
-  > client-server 간 network latency 는 [BDP(Bandwidth Delay Product)](https://en.wikipedia.org/wiki/Bandwidth-delay_product) 를 측정하여 알 수 있다.
 
-## 가용성 관련 설정
-* min.insync.replicas
-  * 메시지 프로듀싱 성공으로 응답하기 위해 최소로 요구하는, 리더 파티션에 프로듀싱된 메시지를 복제 성공한 팔로워 파티션 개수 (default: 1)
-  * acks 가 all 일경우, 브로커는 리더 파티션 프로듀싱 + min.insync.replicas 수 만큼의 팔로워 파티션 동기화 가 모두 되어야 프로듀서로 ack 를 응답한다.
-  * 토픽의 replication factor 값보다 작아야하며, 일반적으로 replication factor 보다 1 ~ 2 정도 작은 값으로 설정
-    * 팔로워 파티션의 목적은, (리더든, 팥로워든)파티션중 하나에 장애가 발생하더라도 문제없이 서비스가 돌아가게 하기 위함이다(fault tolerance)
-    * 가용성을 높힌다고 min.insync.replicas 를 replication factor 와 동일한 값으로 설정할경우, 브로커 한대에서만 장애가 발생해도 전체 kafka cluster 장애로 이어져(오히려 가용성 저하) 위험하다.
-      * 리더 파티션 뿐만 아니라 모든 팔로워 파티션에까지 동기화가 되어야 프로듀싱 성공으로 판단
-      * 파티션중 하나에 장애가 발생할경우, min.insync.replicas 를 만족할 수 없고 그로인해 모든 프로듀싱 요청에 실패로 응답
-* default.replication.factor
-  * auto.create.topics.enable 에 의해 자동으로 생성된 topic 에 적용할 replication factor 값 (default : 1)
-    * 수동으로 생성된 topic 은 topci 생성 시점에 replication factor 명시할 수 있다.
-  * replication.factor 를 클러스터의 브로커 서버 수의 배수로 설정하여 각 브로커 서버에 가해지는 부하를 동일하게 유지하는것이 좋다.
-
-## 기타 Broker 설정
-* auto.create.topics.enable
-  * 클라이언트에서 프로듀싱 / 컨슈밍 요청한 토픽이 존재하지 않는 토픽일시, 토픽을 새로 생성할지 여부 (default : true)
-  * 상용 환경에선 미리 생성된 토픽에 대한 요청만 처리하는것이 안전하므로 false 로 설정 권장
-* [num.replica.fetchers](https://kafka.apache.org/documentation/#brokerconfigs_num.replica.fetchers)
-* [request.timeout.ms](https://kafka.apache.org/documentation/#brokerconfigs_request.timeout.ms)
-* [message.max.bytes](https://kafka.apache.org/documentation/#brokerconfigs_message.max.bytes)
-* [socket.request.max.bytes](https://kafka.apache.org/documentation/#brokerconfigs_socket.request.max.bytes)
-* [connections.max.idle.ms](https://kafka.apache.org/documentation/#brokerconfigs_connections.max.idle.ms)
 <details> 
 <summary> 참고 </summary>
 * unclean.leader.election.enable
