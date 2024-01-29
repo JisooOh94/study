@@ -5,10 +5,8 @@
 * 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
 
 ### 역할
-* kafka 브로커들의 상태 관리
-  * 컨트롤러 브로커 선출
-  * 브로커에 장애 발생시, 컨트롤러 브로커에 노티
-  * 노티를 받은 컨트롤러 브로커는 장애 발생한 브로커가 가지고 있던 파티션 리더 재선출
+* 컨트롤러 브로커 선출 및 컨트롤러 브로커의 h/c 수행
+  * 컨트롤러 브로커 h/c 실패시, 새로운 컨트롤러 브로커 선출
 * 토픽 정보 저장 (파티션 개수, replicas 위치등)
 * 파티션 offset 저장
 
@@ -23,7 +21,7 @@
 * zookeeper 도 여러대의 zookeeper 서버를 묶은 클러스터(a.k.a ensemable) 로 구성하여 고가용성을 확보할 수 있다.
 * ensemble 로 구성할 경우, 여러대의 zookeeper 노드중 한대가 자동으로 leader 노드로 선출되며, leader 를 제외한 follower 노드들은 leader 로부터 데이터를 동기화받는다.
 * leader 노드에 장애가 발생하게되면, 다른 노드가 다시 leader로 선출되어 서비스를 이어나감으로서 고가용성을 확보한다. 
-* 하지만, 살아있는 zookeeper 노드수가 전체 노드의 과반수를 넘지못하면 zookeeper 는 majority 를 확보하지 못하여 더이상 서비스를 지속하지 않고 중단한다.
+* 하지만, 살아있는 zookeeper 노드수가 전체 노드의 과반수를 넘지못하면 zookeeper 는 majority 를 확보하지 못하여 더이상 서비스를 지속하지 않고 중단한다. (Quorum 알고리즘)
 * 따라서 zookeeper 노드수는 majority 관점에서 홀수개수로 설정하는것이 더 좋다.
     * 노드수가 5개일 경우, 2개의 노드가 죽어도 살아있는 노드가 전체노드의 과반을 넘으므르 zookeeper 는 서비스를 계속 이어나간다.
     * 반면에 노드수가 6개일경우에도, 2개의 노드가 죽었을때까지만 zookeeper 서비스를 이어나갈 수 있다. 3개의 노드가 죽는다면 살아있는 노드가 과반을 넘지못하므로 서비스가 중단된다.
@@ -79,3 +77,4 @@ server.1=localhost:2888:3888
 > * https://yeon-kr.tistory.com/184
 > * https://zookeeper.apache.org/doc/r3.3.3/zookeeperAdmin.html
 > * https://velog.io/@bbkyoo/Apache-Kafka-%ED%81%B4%EB%9F%AC%EC%8A%A4%ED%84%B0-%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0
+> * https://velog.io/@hyun6ik/Apache-Kafka-Broker-Zookeeper
