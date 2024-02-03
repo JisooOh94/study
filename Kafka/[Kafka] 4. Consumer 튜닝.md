@@ -15,13 +15,35 @@
 # Consumer 성능 관련 설정
 * group.id
   * 컨슈머가 속하는 컨슈머 그룹 id
+* auto.commit.enable
+  * 파티션에 오프셋 정보가 없는경우(에러로 인한 유실 or 처음 생성된 파티션 등) 처리 방법
+  * earliest : 최초의 오프셋 값으로 설정
+  * latest : 가장 마지막 오프셋 값으로 설정
+  * none : 예외 throw
+* session.timeout.ms
+  * 컨슈머와 컨슈머 그룹 사이의 세션 타임 아웃 시간
+  * 컨슈머는 heartbeat.interval.ms 시간 간격으로 Consumer Group Coordinator에게 hbm 전송
+  * 컨슈머가 session.timeout.ms 시간 내에 hbm 을 Consumer Group Coordinator으로 날리지 않으면, Consumer Group Coordinator는 해당 컨슈머에 장애가 발생한것으로 인지하고 리밸런싱 수행
+  * 값이 작을수록 더 빠르게 컨슈머의 장애를 감지할 수 있다는 장점이 있으나, 실제 장애가 아닌, 일시적인 지연까지 장애로 감지하여 빈번한 리밸런싱([빈번한 리밸런싱이 좋지 않은 이유]())을 유발하는 단점 존재
+* heartbeat.interval.ms
+  * kafka consumer 스레드의 health 를 체크하기 위한 설정값이며, 컨슈머가 Consumer Group Coordinator에게 hbm 을 보내는 시간 주기
+  * session.timeout.ms 보다 작게 설정해야한다. 일반적으로 session.timeout.ms 의 1/3 값으로 설정한다. 
+  * heartbeat.interval.ms 가 작을수록 빈번하게 hbm 을 전송하여 불필요한 리밸런싱을 방지 할 수 있으나, 그만큼 Consumer Group Coordinator에게 부하가 증가된다는 단점 존재
+* max.poll.interval.ms
+  * 메시지를 처리하는 어플리케이션 프로세스 스레드의 health 를 체크하기 위한 설정값이며 컨슈머에서 poll() 을 호출한후, 다음 poll() 을 호출할때까지 최대 대기시간
+  * 이 시간내애 poll() 을 호출하지 않으면 Consumer Group Coordinator 는 해당 컨슈머가 장애 상황으로 판단하고 리밸런싱을 수행한다.
+      * 엄밀히 말하자면, 브로커가 장애상황으로 판단하는것이 아닌, 컨슈머가 스스로 더이상 hbm 을 브로커로 전송하지 않아 장애상황 인것처럼 연기하는것이다.
+  * 어플리케이션이 정상 상황일때 poll 로 읽어온 메시지들의 평균 처리 시간에 맞춰 본 설정값을 튜닝해야한다.
+* max.poll.records
+  * poll() 로 가져올 수 있는 최대 레코드 배치 크기(최대 메시지 개수)
+  * 한번에 너무 많은 메시지를 가져오면, 처리에 오래걸려 max.poll.interval.ms 시간 내에 다음 poll() 을 수행하지 못할수도 있다. max.poll.interval.ms 에 맞춰 튜닝 필요
 * fetch.min.bytes
-  * 컨슈머가 브로커로 fethc 요청을 전송했을때, 브로커가 내려줄 수 있는 레코드 배치 최소 크기 (default : 1 byte)
+  * 컨슈머가 브로커로 fetch 요청을 전송했을때([poll 과 fetch 의 차이]()), 브로커가 내려줄 수 있는 레코드 배치 최소 크기 (default : 1 byte)
   * 브로커의 파티션에 쌓여있는 레코드가 fetch.min.bytes 이하일경우, fetch.min.bytes 이상 쌓일때까지 기다렸다가 응답한다.
   * 너무 빈번하게 featch 요청이 전송되는것을 방지하기때문에 네트워크 트래픽도 절약할 수 있고, 브로커에 가해지는 부하도 감소한다.
 * fetch.max.wait.ms
-  * 컨슈머로부터 fetch 요청을 수신했을때, fetch.min.bytes 만큼의 레코드가 파티션에 쌓여있지 않을경우 응답하지 않고 기다린다.
-  * 이때, 무한히 응답을 미룰 수 없으므로, 대기시간이 fetch.max.wait.ms 이 넘어가면 fetch.min.bytes 만큼 레코드가 쌓이지 않았어도 응답한다. (default : 500ms)  
+  * 브로커는 컨슈머로부터 fetch 요청을 수신했을때, fetch.min.bytes 만큼의 레코드가 파티션에 쌓여있지 않을경우 응답하지 않고 기다린다.
+  * 이때, 무한히 응답을 미룰 수 없으므로, 대기시간이 fetch.max.wait.ms 이 넘어가면 fetch.min.bytes 만큼 레코드가 쌓이지 않았어도 응답한다. (default : 500ms)
 * fetch.max.bytes
   * 컨슈머가 한번의 fetch 요청으로 브로커로부터 가져올 수 있는 최대 레코드 배치 크기
   * 하지만 절대적인 값은 아니다. fetch.max.bytes 보다 큰 크기의 레코드 배치를 가져올 수 있다.
@@ -32,28 +54,6 @@
   * 컨슈머가 한번에 fetch 요청으로 하나의 파티션으로부터 가져올 수 있는 최대 레코드 배치 크기
   * fetch.max.bytes 와 마찬가지로, 컨슈머는 여러개의 파티션을 구독할 수 있기때문에, 컨슈머가 수신할 수 있는 전체 레코드 배치 최대 크기는 이 설정값보다 커질 수 있다.
   * 일반적으로, 브로커가 저장할 수 있는 최대 메시지 크기 설정값(message.max.bytes) 보다 큰 값으로 설정하는것이 좋다.
-* auto.commit.enable
-  * 파티션에 오프셋 정보가 없는경우(에러로 인한 유실 or 처음 생성된 파티션 등) 처리 방법
-  * earliest : 최초의 오프셋 값으로 설정
-  * latest : 가장 마지막 오프셋 값으로 설정
-  * none : 예외 throw
-* session.timeout.ms
-  * 컨슈머와 컨슈머 그룹 사이의 세션 타임 아웃 시간
-  * 컨슈머는 heartbeat.interval.ms 시간 간격으로 리더 컨슈머에게 hbm 전송
-  * 컨슈머가 session.timeout.ms 시간 내에 hbm 을 컨슈머 그룹으로 날리지 않으면, 리더 컨슈머는 해당 컨슈머에 장애가 발생한것으로 인지하고 리밸런싱 수행
-  * 값이 작을수록 더 빠르게 컨슈머의 장애를 감지할 수 있다는 장점이 있으나, 실제 장애가 아닌, 일시적인 지연까지 장애로 감지하여 빈번한 리밸런싱을 유발하는 단점 존재
-* heartbeat.interval.ms
-  * 컨슈머가 리더 컨슈머에게 hbm 을 보내는 시간 주기
-  * session.timeout.ms 보다 작게 설정해야한다.
-  * heartbeat.interval.ms 가 작을수록 빈번하게 hbm 을 전송하여 불필요한 리밸런싱을 방지 할 수 있으나, 그만큼 리더 컨슈머에게 부하가 증가된다는 단점 존재
-* max.poll.interval.ms
-  * 컨슈머에서 poll() 을 호출한후, 다음 poll() 을 호출할때까지 최대 대기시간
-  * 이 시간내애 poll() 을 호출하지 않으면 브로커는 해당 컨슈머가 장애 상황으로 판단하고 리밸런싱을 수행한다.
-      * 엄밀히 말하자면, 브로커가 장애상황으로 판단하는것이 아닌, 컨슈머가 스스로 더이상 hbm 을 브로커로 전송하지 않아 장애상황 인것처럼 연기하는것이다.
-  * poll() 로 읽어온 메시지들의 처리가 오래걸릴경우, 이 설정값을 늘려주어야 한다.
-* max.poll.records
-  * poll() 로 가져올 수 있는 최대 레코드 배치 크기(최대 메시지 개수)
-  * 한번에 너무 많은 메시지를 가져오면, 처리에 오래걸려 max.poll.interval.ms 시간 내에 다음 poll() 을 수행하지 못할수도 있다. max.poll.interval.ms 에 맞춰 튜닝 필요
 * auto.offset.reset
   * 토픽에 대한 offset 정보가 없을때, 파티션의 몇번째 메시지부터 컨슘하기 시작해야하는지에 대한 정책
       * 생성되고 난후 아직 컨슈머 그룹 할당이 되지 않은 토픽이거나, offsets.retention.minutes 에 의해 offset 정보가 삭제된 토픽일경우 offset 정보가 없을 수 있다.
@@ -64,7 +64,6 @@
 
 ### 컨슈머 그룹 및 컨슈머 개수
 * group.id 설정값으로 컨슈머들을 그룹화 가능
-  * 컨슈머 그룹도 (파티션 리더처럼) 컨슈머 그룹내 한 컨슈머를 컨슈머 리더(a.k.a Consumer Group Coordinator)로 선출, 리더 컨슈머가 컨슈머들에게 파티션 할당
 * 토픽을 구독하는 컨슈머 그룹의 컨슈머 개수는 토픽의 파티션 개수의 약수로 설정하는것이 바람직
   * 파티션 개수보다 컨슈머의 개수가 많을경우, 파티션을 할당받지 못한 컨슈머는 무한히 대기하게 되므로 컨슈머 낭비 발생
   * 컨슈머 개수가 파티션 개수의 약수가 아니면, 각 컨슈머에 파티션이 비 균일하게 할당되어 특정 파티션에 부하가 몰리는 현상 발생가능
@@ -184,14 +183,39 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 ```
 
 ### Static membership 을 통한 rolling-restart 시 리밸런싱 회피
-* 일반적인 경우에, 컨슈머가 컨슈머 그룹에 참여시 자동으로 생성한 unique id 를 가지고 리더 컨슈머에게 JoinGroupRequest 요청을 보낸다.
-* 리더 컨슈머는 unique id 를 가지고 신규 컨슈머를 인지, 파티션 리밸런싱을 수행한다. 이같은 방식이 dynamic membership 이다.
+* 일반적인 경우에, 컨슈머가 컨슈머 그룹에 참여시 자동으로 생성한 unique id 를 가지고 Consumer Group Coordinator에게 JoinGroupRequest 요청을 보낸다.
+* Consumer Group Coordinator는 unique id 를 가지고 신규 컨슈머를 인지, 파티션 리밸런싱을 수행한다. 이같은 방식이 dynamic membership 이다.
 * 이때, 배포등을 위해 컨슈머 서버들을 rolling restart 하는경우 한대씩 restart 할때마다 매번 리밸런싱이 발생한다. 
 * 이로인해 restart 시간이 지연되고, 이미 restart 가 끝난 컨슈머들도 나머지 컨슈머들의 restart 가 모두 끝날때까지 메시지 처리를 하지 못하는 문제가 발생한다.
 * 이를 위해, 컨슈머 마다 고정된 unique id 를 할당하여 restart 시에도 리밸런싱이 발생하지 않도록 하는 static membership 이 존재한다.
   1. group-instance-id 설정값을 통해 각 컨슈머마다 고정된 unique id 를 설정해준다.
   2. consumer restart 시간을 측정하여 해당 시간보다 더 긴 시간을 session.timeout.ms, max-poll-interval-ms 로 설정한다.
 * 위와같이 설정할경우, restart 동안 session timeout 이나 poll timeout 발생으로 인한 리밸런싱도 일어나지 않고, restart 완료되었을때도 이전과 동일한 unique id 로 JoinGroupRequest 를 전송하므로 동일한 컨슈머로 인식되어 리밸런싱 없이 이전과 동일한 파티션을 할당받는다.
+
+
+### 빈번한 리밸런싱이 좋지 않은 이유
+* 리밸런싱은 기본적으로 Stop the world 로 수행된다.
+    * 컨슈머 리밸런싱이 일어날 때, 모든 컨슈머에 할당된 파티션이 해제(revoke)되므로 새로 파티션이 할당되기 전까진 모든 데이터 처리가 일시 정지된다.
+
+<img width="913" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/0e760fdf-b3d3-438f-b744-2a8484e7728d">
+
+> 모든 컨슈머는 'Synchronization barrier'를 넘어가기 전에 메시지 처리를 중지하고 오프셋을 커밋해야 한다.
+
+* 따라서 불필요한 리밸런싱을 최소화 하여 stop the world 시간을 최소화하는것이 중요
+    * 불필요한 리밸런스를 줄이기 위해서는 max.poll.interval.ms와 max.poll.records를 적절히 조정하여 poll 메서드가 일정 간격으로 호출되도록 해야 한다.(프로세스 장애 오탐 방지) 
+    * 필요한 경우에는 heartbeat.interval.ms와 session.timeout.ms를 조정한다. (컨슈머 장애 오탐 방지)
+
+* 또는, Stop the world 없이 리밸런싱을 수행하는 [증분 리밸런싱(kafak 2.3.0 부터 추가)]()을 도입을 고려
+
+### poll 과 fetch 의 차이
+* poll : consumer 가 브로커로부터 메시지를 가져오기 위해 호출하는 메서드
+* fetch : fetcher(consumer 가 호출한 poll 요청 처리 모듈) 에서 브로커에 데이터를 요청하는 request를 전송하는 메서드 
+* 즉, consumer 는 poll 메서드로 메시지를 요청하고, poll 메서드 내부적으로 fetch 가 호출되며 fetch 메서드에서 브로커로부터 메시지를 받아와 consumer 에게 전달해주는 형식
+
+<img width="882" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/2cc0fda3-afda-43c0-be03-caa1ce35dae6">
+
+### 증분 리밸런싱
+https://devidea.tistory.com/100
 
 ***
 > Reference
@@ -220,3 +244,7 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 > * https://4orty.tistory.com/20#recentEntries
 > * https://velog.io/@lsang89/Kafka-Consumer-Rebalancing-%EA%B4%80%EB%A6%AC
 > * https://www.confluent.io/blog/dynamic-vs-static-kafka-consumer-rebalancing/
+> * https://medium.com/@rinu.gour123/kafka-performance-tuning-ways-for-kafka-optimization-fdee5b19505b
+> * https://d2.naver.com/helloworld/0974525
+> * https://redpanda.com/guides/kafka-performance/kafka-performance-tuning
+> * https://bigdatalab.tistory.com/25
