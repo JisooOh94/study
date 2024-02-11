@@ -196,6 +196,7 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 ### 빈번한 리밸런싱이 좋지 않은 이유
 * 리밸런싱은 기본적으로 Stop the world 로 수행된다.
     * 컨슈머 리밸런싱이 일어날 때, 모든 컨슈머에 할당된 파티션이 해제(revoke)되므로 새로 파티션이 할당되기 전까진 모든 데이터 처리가 일시 정지된다.
+    * Kafka v3.4 부터 Eager Rebalance > [Incremental Cooperative Rebalance(증분 리밸런싱)](https://cwiki.apache.org/confluence/display/KAFKA/KIP-429%3A+Kafka+Consumer+Incremental+Rebalance+Protocol) 으로 리밸런싱 전략이 수정되면서 STW 없이(파티션 단위 STW 는 존재) 리밸런스가 수행된다.
 
 <img width="913" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/0e760fdf-b3d3-438f-b744-2a8484e7728d">
 
@@ -213,9 +214,6 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 * 즉, consumer 는 poll 메서드로 메시지를 요청하고, poll 메서드 내부적으로 fetch 가 호출되며 fetch 메서드에서 브로커로부터 메시지를 받아와 consumer 에게 전달해주는 형식
 
 <img width="882" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/2cc0fda3-afda-43c0-be03-caa1ce35dae6">
-
-### 증분 리밸런싱
-https://devidea.tistory.com/100
 
 ***
 > Reference
@@ -248,3 +246,5 @@ https://devidea.tistory.com/100
 > * https://d2.naver.com/helloworld/0974525
 > * https://redpanda.com/guides/kafka-performance/kafka-performance-tuning
 > * https://bigdatalab.tistory.com/25
+> * https://devidea.tistory.com/100
+> * https://studyandwrite.tistory.com/547
