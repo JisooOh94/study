@@ -39,7 +39,7 @@
     * linger.ms 시간 이전에 Accumulator 버퍼에 batch.size 만큼 메시지 축적시 linger.ms 무시하고 바로 전송
     * 너무 짧게 설정하여 batch.size 만큼 메시지가 축적되기 전에 메시지 전송이 계속 trigger 된다면 레이턴시는 빨라지나, 네트워크 비용이 많아지므로(tcp 커넥션 생성, rtt 등) 쓰루풋이 떨어져 비효율적이다.
     * 너무 길게 설정하면, bath.size 만큼 메시지가 축적되길 대기하는 시간이 너무 길어지므로 일부 메시지의 producing 이 지연될 수 있다. (쓰루풋 약간 개선되나 레이턴시가 떨어짐)
-    * 일반적으로, 지연과 네트워크 비용사이에 적절히 타협하여 10 또는 100 으로 설정
+    * 일반적으로, 레이턴시와 네트워크 비용사이에 적절히 타협하여 10 또는 100 으로 설정
     * default : 0
 
 ### Communcating with broker
@@ -54,7 +54,6 @@
     * all / -1
         * 리더 파티션 및 토픽의 min.insync.replicas 수만큼 팔로워 파티션에 메시지 저장 성공시 성공으로 판단. 리더 파티션은 팔로워 파티션으로부터 ack 응답 수신 후 프로듀서로 ack 응답 전송
         * 높은 내구성 보장하나 쓰르풋 및 레이턴시 많이 떨어짐
-
 * retries
     * 메시지 전송 실패시, 재시도 횟수
     * 브로커 서버나 네트워크상의 일시적인 에러 발생시, 이는 금방 복구 될 수 있다. 이런경우 retries 를 설정하여 재시도하다보면 에러가 복구되어 정상 처리할 수 있게된다.
@@ -65,12 +64,10 @@
     * 반대로, retries 횟수를 많이 설정하면, 메시지 유실율은 줄어들지만 그만큼 쓰루풋과 레이턴시가 나빠진다.
     * default : 0 (~ version 2.0), MAX_INT (version 2.1 ~)
         * 2.1 버전 이상부터는 재시도 관련해서 retries 보단 delivery.timeout.ms 로 제어한다. 그래서 retires 의 default 값이 MAX_INT(2147483647) 이다.
-
 * delivery.timeout.ms
     * send() 메서드를 호출하고 브로커로부터 성공 응답(ack)을 받을떄까지 대기하는 시간.
     * 실패 응답 수신시 retries 값에 따라 재시도하는 시간도 포함된 값이며 재시도 횟수를 delivery.timeout.ms 시간 전에 모두 소진하면 에러 응답
     * request.timeout.ms + linger.ms 의 합보다 크거나 같아야함
-
 * compression.type
   * 메시지 압축 포맷 설정, 설정시 브로커로 메시지 압축하여 전송
   * 메시지 크기가 커 네트워크 대역폭에 부하를 주거나 브로커 저장 공간이 부족할시 적용
@@ -97,8 +94,8 @@
 * kafka 에서는 위와같은 문제를 해결하기 위해 EOS(Exactly once semantics) 를 보장하는 멱등 프로듀서(Idempotent producer) 를 지원한다.
 
 ### 멱등 프로듀서(Idempotent producer)
-* Kafka 는 기본적으로 최소 한번의 메시지 전송은 보장 하는 At Least Once Delivery 정책이었다. 
-  * 프로듀서에서 메시지가 전송되었다는 ack를 받지 못할 경우 retry send를 하는 방법으로 최소 1회의 전송을 보장 
+* Kafka 는 기본적으로 최소 한번의 메시지 프로듀싱은 보장 하는 At Least Once Delivery 정책이었다. 
+  * 프로듀서에서 메시지가 프로듀싱되었다는 ack를 받지 못할 경우 retry send를 하는 방법으로 최소 1회의 전송을 보장 
 * 하지만 0.11 버전부터 정확히 한번만 메시지 전송을 보장(exactly once delivery) 하기 위해 idempotent producer가 추가되었다.
 * idempotent producer 동작 방식
   * 프로듀서에서 메시지 프로듀싱시, 메시지 헤더에 producer id, sequence number 를 추가하여 브로커로 전송
@@ -109,12 +106,18 @@
   * kafka 3.0 부턴 default 로 멱등 프로듀서가 활성화 되어있으나, 2.8 버전 이하에선 직접 설정해주어야 한다. 
   * enable.idempotence : true(enable.idempotence 가 true 일때, 아래의 조건들이 만족되지 않으면 config exception throw)
   * acks : all(-1)
-  * max.in.flight.requests.per.connection : 5 이하 (도잇성을 최대로 하여 성능을 극대화하기 위해 최대값인 5로 설정하는것이 좋음)
+  * max.in.flight.requests.per.connection : 5 이하 (동시성을 최대로 하여 성능을 극대화하기 위해 최대값인 5로 설정하는것이 좋음)
   * retries : MAX_INT(enable.idempotence 를 true 로 설정하면 retries 는 자동으로 MAX_INT 로 설정됨)
 
-
 ### 멱등 컨슈머
-* TBU
+* 컨슈머도 프로듀서와 마찬가지로 Exactly once 컨슈밍을 보장하는 멱등 컨슈머 구축이 가능하다.
+* 다만 Exactly once 프로듀싱을 자동으로 보장해주는 idempotent producer 가 있는 프로듀서와는 다르게, 컨슈머는 At least once / At most once 컨슈밍 중 하나만 보장해준다.
+* 따라서 At least once 컨슈밍 으로 설정 후, At most once 는 별도 비즈니스 로직을 통해 보장해주어야 한다.
+    * At lease once 컨슈밍 설정 : offset auto-commit 비활성화 + 컨슈밍한 메시지 offset commit 을 메시지 처리 완료 후에 하도록 설정. 이를 통해 메시지가 정상적으로 처리되었을때에만 다음 메시지를 컨슈밍하게 함으로서 At lease once 컨슈밍 보장
+* At most once 를 보장하기 위해선
+    1. 메시지 전체 처리 과정을 하나의 트랜잭션으로 묶는다. 이를 통해, 일부 처리 로직이 실패하여 다시 메시지 컨슈밍 및 처리할때에도 멱등성을 보장한다.
+    2. 메시지 처리 완료시, offset commit 전, 처리한 메시지의 식별자를 저장공간에 저장한다. 
+    3. 이후 메시지 컨슈밍하여 처리하기전, 저장공간을 조회하여 이미 처리되었던 메시지인지 먼저 판단후 처리하도록 한다.
 
 > Reference
 > * https://ohjongsung.io/2020/01/04/%EC%B9%B4%ED%94%84%EC%B9%B4-%ED%8A%9C%EB%8B%9D-%EB%B0%A9%EC%95%88-%EC%A0%95%EB%A6%AC
@@ -129,3 +132,5 @@
 > * https://blog.naver.com/PostView.naver?blogId=fbfbf1&logNo=223101741560&categoryNo=84&parentCategoryNo=37&viewDate=&currentPage=1&postListTopCurrentPage=1&from=postView
 > * https://devlog-wjdrbs96.tistory.com/436
 > * https://sjparkk-dev1og.tistory.com/207
+> * https://ssnotebook.tistory.com/48
+> * https://bistros.tistory.com/entry/Kafka-idempotent-producer-%EB%A9%B1%EB%93%B1%EC%84%B1%EC%97%90-%EA%B4%80%ED%95%B4%EC%84%9C
