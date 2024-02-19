@@ -15,45 +15,49 @@
 # Consumer 성능 관련 설정
 * group.id
   * 컨슈머가 속하는 컨슈머 그룹 id
-* auto.commit.enable
-  * 파티션에 오프셋 정보가 없는경우(에러로 인한 유실 or 처음 생성된 파티션 등) 처리 방법
-  * earliest : 최초의 오프셋 값으로 설정
-  * latest : 가장 마지막 오프셋 값으로 설정
-  * none : 예외 throw
+  
 * session.timeout.ms
   * 컨슈머와 컨슈머 그룹 사이의 세션 타임 아웃 시간
   * 컨슈머는 heartbeat.interval.ms 시간 간격으로 Consumer Group Coordinator에게 hbm 전송
   * 컨슈머가 session.timeout.ms 시간 내에 hbm 을 Consumer Group Coordinator으로 날리지 않으면, Consumer Group Coordinator는 해당 컨슈머에 장애가 발생한것으로 인지하고 리밸런싱 수행
   * 값이 작을수록 더 빠르게 컨슈머의 장애를 감지할 수 있다는 장점이 있으나, 실제 장애가 아닌, 일시적인 지연까지 장애로 감지하여 빈번한 리밸런싱([빈번한 리밸런싱이 좋지 않은 이유]())을 유발하는 단점 존재
+  * default : 300000 (5 min)
 * heartbeat.interval.ms
   * kafka consumer 스레드의 health 를 체크하기 위한 설정값이며, 컨슈머가 Consumer Group Coordinator에게 hbm 을 보내는 시간 주기
   * session.timeout.ms 보다 작게 설정해야한다. 일반적으로 session.timeout.ms 의 1/3 값으로 설정한다. 
   * heartbeat.interval.ms 가 작을수록 빈번하게 hbm 을 전송하여 불필요한 리밸런싱을 방지 할 수 있으나, 그만큼 Consumer Group Coordinator에게 부하가 증가된다는 단점 존재
+  * default : 3000
 * max.poll.interval.ms
   * 메시지를 처리하는 어플리케이션 프로세스 스레드의 health 를 체크하기 위한 설정값이며 컨슈머에서 poll() 을 호출한후, 다음 poll() 을 호출할때까지 최대 대기시간
   * 이 시간내애 poll() 을 호출하지 않으면 Consumer Group Coordinator 는 해당 컨슈머가 장애 상황으로 판단하고 리밸런싱을 수행한다.
       * 엄밀히 말하자면, 브로커가 장애상황으로 판단하는것이 아닌, 컨슈머가 스스로 더이상 hbm 을 브로커로 전송하지 않아 장애상황 인것처럼 연기하는것이다.
   * 어플리케이션이 정상 상황일때 poll 로 읽어온 메시지들의 평균 처리 시간에 맞춰 본 설정값을 튜닝해야한다.
+  * default : 300000
 * max.poll.records
   * poll() 로 가져올 수 있는 최대 레코드 배치 크기(최대 메시지 개수)
   * 한번에 너무 많은 메시지를 가져오면, 처리에 오래걸려 max.poll.interval.ms 시간 내에 다음 poll() 을 수행하지 못할수도 있다. max.poll.interval.ms 에 맞춰 튜닝 필요
+  * default : 500
 * fetch.min.bytes
   * 컨슈머가 브로커로 fetch 요청을 전송했을때([poll 과 fetch 의 차이]()), 브로커가 내려줄 수 있는 레코드 배치 최소 크기 (default : 1 byte)
   * 브로커의 파티션에 쌓여있는 레코드가 fetch.min.bytes 이하일경우, fetch.min.bytes 이상 쌓일때까지 기다렸다가 응답한다.
   * 너무 빈번하게 featch 요청이 전송되는것을 방지하기때문에 네트워크 트래픽도 절약할 수 있고, 브로커에 가해지는 부하도 감소한다.
+  * default : 1
 * fetch.max.wait.ms
   * 브로커는 컨슈머로부터 fetch 요청을 수신했을때, fetch.min.bytes 만큼의 레코드가 파티션에 쌓여있지 않을경우 응답하지 않고 기다린다.
   * 이때, 무한히 응답을 미룰 수 없으므로, 대기시간이 fetch.max.wait.ms 이 넘어가면 fetch.min.bytes 만큼 레코드가 쌓이지 않았어도 응답한다. (default : 500ms)
+  * default : 500
 * fetch.max.bytes
   * 컨슈머가 한번의 fetch 요청으로 브로커로부터 가져올 수 있는 최대 레코드 배치 크기
   * 하지만 절대적인 값은 아니다. fetch.max.bytes 보다 큰 크기의 레코드 배치를 가져올 수 있다.
     * 하나의 컨슈머는 여러개의 파티션을 구독할 수 있고, 각 파티션은 여러개의 브로커 서버에 분산되어 있을 수 있다.
     * 따라서 컨슈머의 fetch 요청도 여러개의 브로커 서버로 갈 수 있으며 이때, 컨슈머가 수신할 수 있는 전체 메시지의 최대크기는 fetch.max.bytes * fetch 요청한 브로커 서버수 이다.
   * 일반적으로, 브로커가 저장할 수 있는 최대 메시지 크기 설정값(message.max.bytes) 보다 큰 값으로 설정하는것이 좋다.
+  * default : 57671680 (55 mebibytes)
 * max.partition.fetch.bytes
   * 컨슈머가 한번에 fetch 요청으로 하나의 파티션으로부터 가져올 수 있는 최대 레코드 배치 크기
   * fetch.max.bytes 와 마찬가지로, 컨슈머는 여러개의 파티션을 구독할 수 있기때문에, 컨슈머가 수신할 수 있는 전체 레코드 배치 최대 크기는 이 설정값보다 커질 수 있다.
   * 일반적으로, 브로커가 저장할 수 있는 최대 메시지 크기 설정값(message.max.bytes) 보다 큰 값으로 설정하는것이 좋다.
+  * default : 1048576 (1 mebibytes)
 * auto.offset.reset
   * 토픽에 대한 offset 정보가 없을때, 파티션의 몇번째 메시지부터 컨슘하기 시작해야하는지에 대한 정책
       * 생성되고 난후 아직 컨슈머 그룹 할당이 되지 않은 토픽이거나, offsets.retention.minutes 에 의해 offset 정보가 삭제된 토픽일경우 offset 정보가 없을 수 있다.
@@ -61,6 +65,7 @@
       * latest : 파티션의 가장 마지막 메시지의 offset 사용
       * earliest : 파티션의 가장 첫번째 메시지의 offset 사용
       * none : 토픽의 offset 정보가 없을경우, 컨슈머에게 에러 응답
+  * default : latest
 
 ### 컨슈머 그룹 및 컨슈머 개수
 * group.id 설정값으로 컨슈머들을 그룹화 가능
@@ -215,6 +220,16 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 
 <img width="882" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/2cc0fda3-afda-43c0-be03-caa1ce35dae6">
 
+### 멱등 컨슈머
+* 컨슈머도 프로듀서와 마찬가지로 Exactly once 컨슈밍을 보장하는 멱등 컨슈머 구축이 가능하다.
+* 다만 Exactly once 프로듀싱을 자동으로 보장해주는 idempotent producer 가 있는 프로듀서와는 다르게, 컨슈머는 At least once / At most once 컨슈밍 중 하나만 보장해준다.
+* 따라서 At least once 컨슈밍 으로 설정 후, At most once 는 별도 비즈니스 로직을 통해 보장해주어야 한다.
+  * At lease once 컨슈밍 설정 : offset auto-commit 비활성화 + 컨슈밍한 메시지 offset commit 을 메시지 처리 완료 후에 하도록 설정. 이를 통해 메시지가 정상적으로 처리되었을때에만 다음 메시지를 컨슈밍하게 함으로서 At lease once 컨슈밍 보장
+* At most once 를 보장하기 위해선
+  1. 메시지 전체 처리 과정을 하나의 트랜잭션으로 묶는다. 이를 통해, 일부 처리 로직이 실패하여 다시 메시지 컨슈밍 및 처리할때에도 멱등성을 보장한다.
+  2. 메시지 처리 완료시, offset commit 전, 처리한 메시지의 식별자를 저장공간에 저장한다.
+  3. 이후 메시지 컨슈밍하여 처리하기전, 저장공간을 조회하여 이미 처리되었던 메시지인지 먼저 판단후 처리하도록 한다.
+
 ***
 > Reference
 > * https://soft.plusblog.co.kr/14
@@ -248,3 +263,5 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 > * https://bigdatalab.tistory.com/25
 > * https://devidea.tistory.com/100
 > * https://studyandwrite.tistory.com/547
+> * https://ssnotebook.tistory.com/48
+> * https://bistros.tistory.com/entry/Kafka-idempotent-producer-%EB%A9%B1%EB%93%B1%EC%84%B1%EC%97%90-%EA%B4%80%ED%95%B4%EC%84%9C
