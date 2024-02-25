@@ -80,6 +80,23 @@
   * 브로커가 허용하는 최대 메시지 크기, 이 크기를 넘어가는 메시지(레코드 배치) 프로듀싱 요청은 거절된다.
   * 카프카 버전이 0.10.2 이전 버전이라면, 본 값 증대시 consumer 의 fetch 가능 최대 메시지 크기 설정값(fetch.max.bytes, max.partition.fetch.bytes) 또한 증대시켜주어야 한다.
   * topic 별로 별도의 허용 최대 메시지 크기 값을 설정하고 싶다면, max.message.bytes 값 설정
+* [retention.bytes](https://kafka.apache.org/33/documentation.html#topicconfigs_retention.bytes)
+  * 한 파티션에 저장될 수 있는 전체 메시지 크기
+  * 파티션에 저장된 전체 메시지 크기가 본 설정값을 초과하는 경우, cleanup.policy 에 따라 메시지가 삭제되거나 압축된다.
+  * 파티션 하나에 대한 디스크 사용량 제약이므로, 브로커 서버가 여러개의 파티션을 가지고있는경우, 디스크 사용량이 최대 retention.bytes * 파티션 개수 + a 만큼 커질 수 있다.
+  * default : -1 (no limit)
+* [retention.ms](https://kafka.apache.org/33/documentation.html#topicconfigs_retention.ms)
+  * (프로듀싱되어) 파티션에 저장된 메시지의 최대 수명
+  * 파티션에 저장된 메시지의 저장된 기간이 본 설정값을 초과하는 경우, cleanup.policy 에 따라 메시지가 삭제되거나 압축된다.
+  * default : 604800000 (7 days)
+* [log.retention.check.interval.ms](https://kafka.apache.org/33/documentation.html#brokerconfigs_log.retention.check.interval.ms)
+  * retention.bytes 를 초과하는 파티션이나 retention.ms 를 초과하는 메시지가 있는지 검사하는 주기
+  * default : 300000 (5 minutes)
+* [cleanup.policy](https://kafka.apache.org/33/documentation.html#topicconfigs_cleanup.policy)
+  * retention.bytes, retention.ms 를 초과한 메시지에 대한 처리 방법
+  * compact, delete 중에 선택할 수 있으며 두가지 동시에 적용도 가능
+  * default : delete
+
 * [num.replica.fetchers](https://kafka.apache.org/documentation/#brokerconfigs_num.replica.fetchers)
 * [request.timeout.ms](https://kafka.apache.org/documentation/#brokerconfigs_request.timeout.ms)
 
