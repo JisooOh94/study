@@ -18,7 +18,7 @@
 	* accumulator 에 메시지를 축적해두었다가, 전송이 trigger 되면, sender 에서 batch.size(default: 16kb) 만큼 메시지를 bulk 로 읽어가 토픽으로 전송
 		* 네트워크 트래픽 비용 감소 및, 브로커 서버 부하 감소
 	* sender 에서 메시지 전송하는 속도보다, accumulator 에 축적되는 속도가 더 빨라 버퍼가 가득찰시, accumulator 는 신규 메시지 전송 요청을 max.block.ms(default: 60000) 값 만큼 block하게되며, 그 시간 이후에도 버퍼에 여유공간이 생기지 않는다면 예외 throw
-	* 버퍼 full 로 인한 메시지 전송 요청 실패가 빈번히 발생한다면, accumulator 의 버퍼크기(buffer.memory) 증대 필요
+	* 버퍼 full 로 인한 메시지 전송 요청 실패가 빈번히 발생한다면, [[2.1 Producer Buffer 튜닝]]() 참고
 * Sender
 	* 브로커에 메시지를 전송하는 백그라운드 스레드
 	* Accumulator 에 batch.size 만큼 메시지가 쌓여있으면 브로커로 전송
@@ -35,12 +35,20 @@
 * zookeeper 가 Kafka cluster 의 브로커들중 하나를 컨트롤러 브로커로 선정하여 클러스터 내 브로커 관리 수행 위임
 
 #### Controller broker
-* 토픽 생성시, 설정된 파티션 수에 맞춰 각 브로커에 파티션 분배
-* Kafka cluster 내 브로커들의 h/c 수행. h/c 에 실패한 브로커 발견시 failover 수행
-  * 해당 브로커의 파티션을 리더 파티션으로 사용하던 토픽들의 리더 파티션 재 선출
-  * 재 선출된 리더 파티션들의 정보를 zookeeper 에 저장
-  * ![image](https://github.com/JisooOh94/study/assets/48702893/133d684a-b565-4d9a-bf7b-bf8f38f03a5b)
-* Controller broker 의 h/c 는 zookeeper 가 수행. h/c 실패시 zookeeper 에서 controller broker 재선출 
+* 브로커 관리 
+  * 컨트롤러는 클러스터 내의 모든 브로커의 상태를 추적합니다. 브로커가 클러스터에 추가되거나 제거될 때, 컨트롤러는 이러한 변화를 감지 및 처리
+* 파티션 리더 선출 
+  * 각 토픽은 파티션들이 분배되어있는 브로커들중 하나의 리더 브로커(리더 파티션)를 가짐(모든 읽기와 쓰기 요청은 이 리더 브로커를 통해 처리) 
+  * 리더 브로커에 장애 발생시 파티션이 분배되어있는 다른 브로커들중 하나를 새로운 리더 브로커로 선출
+* 리플리카 할당 및 재할당
+   * 토픽이 생성시, 각 파티션의 리플리카를 어떤 브로커에 할당할지 결정
+   * 또한, 브로커 장애와 같은 상황에서는 리플리카의 재할당 수행 
+* 장애 복구 
+  * Kafka cluster 내 브로커들의 h/c 수행.
+  * 브로커 장애 발생 시, 장애 발생한 브로커의 파티션과 리플리카를 다른 브로커로 이동
+  * 장애 발생한 브로커를 리더 브로커로 사용하던 토픽들의 리더 브로커 재 선출
+
+> cf) Controller broker 의 h/c 는 zookeeper 가 수행. h/c 실패시 zookeeper 에서 controller broker 재선출
 
 #### topic
 * 메시지 구분을 위한 타이틀 개념
