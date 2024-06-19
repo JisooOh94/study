@@ -203,9 +203,14 @@ List<String> list = Collections.synchronizedList(new ArrayList<String>());
 * synchronizedList, synchronizedMap, synchronizedSet 제공
 
 ### Concurrent Collection
-* Thread-safe 하면서, synchronized 블록을 사용하여 병렬적으로 작업 수행이 가능해, 성능 저하도 적음
+* CAS 를 이용한 락-프리 동시성 제어를 통해 높은 동시성과 성능을 제공
+  * 내부적으로 여러 버킷(bucket)으로 데이터를 분산 저장하고, 각 버킷에 대한 업데이트 작업 시 CAS 연산을 통해 수행. 이를 통해 락 경합(lock contention)을 줄여 성능을 향상
+* 여전히 일부분에선 synchronized를 통한 동기화 제어 사용
+  * 특정 버킷의 연결 리스트를 트리(Tree) 구조로 변환하는 작업등과 같이 복잡한 작업 수행시
+  * 일부분에서만 사용되므로 이로인한 성능저하 적음
+
 ```java
-//ConcurrentMap.class
+//ConcurrentHashMap.class
 final V putVal(K key, V value, boolean onlyIfAbsent) {
     if (key == null || value == null) throw new NullPointerException();
     int hash = spread(key.hashCode());
@@ -214,14 +219,17 @@ final V putVal(K key, V value, boolean onlyIfAbsent) {
     	...
         if (tab == null || (n = tab.length) == 0) ...
         else if ((f = tabAt(tab, i = (n - 1) & hash)) == null) {
+            //casTabAt 에서 CAS 를 이용한 put 수행
             if (casTabAt(tab, i, null, new Node<K,V>(hash, key, value, null))) ...
         }
-        else if ((fh = f.hash) == MOVED) ...
-        else {
-            synchronized (f) {
-                ...
+        ...
+}
+
+static final <K,V> boolean casTabAt(Node<K,V>[] tab, int i,Node<K,V> c, Node<K,V> v) {
+    return U.compareAndSwapObject(tab, ((long)i << ASHIFT) + ABASE, c, v);
 }
 ```
+
 * ConcurrentHashMap, ConcurrentLinkedQueue 제공
 
 ***
