@@ -15,7 +15,6 @@
 # Consumer 성능 관련 설정
 * group.id
   * 컨슈머가 속하는 컨슈머 그룹 id
-  
 * session.timeout.ms
   * 컨슈머와 컨슈머 그룹 사이의 세션 타임 아웃 시간
   * 컨슈머는 heartbeat.interval.ms 시간 간격으로 Consumer Group Coordinator에게 hbm 전송
@@ -201,7 +200,7 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
 ### 빈번한 리밸런싱이 좋지 않은 이유
 * 리밸런싱은 기본적으로 Stop the world 로 수행된다.
     * 컨슈머 리밸런싱이 일어날 때, 모든 컨슈머에 할당된 파티션이 해제(revoke)되므로 새로 파티션이 할당되기 전까진 모든 데이터 처리가 일시 정지된다.
-    * Kafka v3.4 부터 Eager Rebalance > [Incremental Cooperative Rebalance(증분 리밸런싱)](https://cwiki.apache.org/confluence/display/KAFKA/KIP-429%3A+Kafka+Consumer+Incremental+Rebalance+Protocol) 으로 리밸런싱 전략이 수정되면서 STW 없이(파티션 단위 STW 는 존재) 리밸런스가 수행된다.
+    * Kafka v2.4 부터 Eager Rebalance > [Incremental Cooperative Rebalance(증분 리밸런싱)](https://cwiki.apache.org/confluence/display/KAFKA/KIP-429%3A+Kafka+Consumer+Incremental+Rebalance+Protocol) 으로 리밸런싱 전략이 수정되면서 STW 없이(파티션 단위 STW 는 존재) 리밸런스가 수행된다.
 
 <img width="913" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/0e760fdf-b3d3-438f-b744-2a8484e7728d">
 
@@ -229,6 +228,34 @@ kafkaListenerContainerFactory.getContainerProperties().setSyncCommits(false);
   1. 메시지 전체 처리 과정을 하나의 트랜잭션으로 묶는다. 이를 통해, 일부 처리 로직이 실패하여 다시 메시지 컨슈밍 및 처리할때에도 멱등성을 보장한다.
   2. 메시지 처리 완료시, offset commit 전, 처리한 메시지의 식별자를 저장공간에 저장한다.
   3. 이후 메시지 컨슈밍하여 처리하기전, 저장공간을 조회하여 이미 처리되었던 메시지인지 먼저 판단후 처리하도록 한다.
+
+### 트랜잭션 컨슈머
+* Consumer 의 메시지 처리 로직을 트랜잭션으로 관리하는것
+  * e.g. 메시지를 컨슘하여 처리하고, 결과를 데이터베이스에 저장하는 일련의 작업을 하나의 트랜잭션으로 처리
+
+```java
+@Transactional
+public void processMessage(ConsumerRecord<String, String> record) {
+    // 비즈니스 로직 처리
+    // 데이터베이스 업데이트
+}
+```
+
+* 메시지 처리 로직이 모두 성공했을때에만 offset commit 수행, 에러 발생시 수행했던 처리 롤백
+  * 이를 통해, exactly-once-consuming 보장 (단, 처리 로직이 DB update 가 아닌경우, 별도 roll-back 로직 필요)
+* offset commit 은 트랜잭션 내에서 수행되지 않는다. 따라서 offset commit 중, 에러 발생시에는 exactly-once-consuming 보장 못함
+
+### Fetch-Offset-Request Fencing
+* 더이상 유효하지 않은 Consumer 에서 메시지를 소비하는 것을 방지하는 기술
+  * consumer 장애로 인한 consumer group 에서의 탈락, 또는 파티션 추가/삭제로 인한 리밸런싱 이후 이전에 할당되었던 파티션의 메시지를 컨슈밍하는 경우 등
+  * `eosMode=V2` 와 같이 설정하여 활성화
+* EOS(Exactly Once Semantics) 를 지원하기 위해 Kafka 2.5 부터 도입
+  * Consumer의 장애나 네트워크 문제 발생 시에도 안전한 오프셋 관리를 가능하게 하여, 데이터 중복 또는 유실 없이 정확히 한 번의 메시지 처리를 보장
+* 주로 Kafka Streams 또는 트랜잭션을 사용하는 Producer와 연동되는 경우에 사용
+* 처리 과정
+  1. CGC 연결: Consumer가 파티션을 할당받아 메시지를 소비하기 시작할 때, CGC는 해당 Consumer에게 "epoch"라는 일련번호도 함께 할당
+  2. Epoch 검증: Consumer가 메시지 소비후 오프셋 커밋시, epoch 번호가 함께 전송. 브로커는 이 epoch 번호를 검증하여, 현재 유효한 Consumer 세션에서 발생한 요청인지 확인
+  3. Fencing Mechanism: 만약 더 이상 유효하지 않은 consumer에서 요청을 보낸 경우, 브로커에서 요청 거부. 이를 통해 잘못된 오프셋 커밋이나 메시지 소비를 방지하여 데이터의 중복 처리나 유실을 막음
 
 ***
 > Reference
