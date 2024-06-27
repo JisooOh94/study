@@ -52,6 +52,12 @@
  
 ![image](https://user-images.githubusercontent.com/48702893/109412875-ddc7c900-79ed-11eb-89a8-970374a1cc6a.png)
 
+> e.g. 브라우저의 파일 다운로드 작업
+> * 브라우저에서 파일 다운로드시 다운로드 작업은 백그라운드로 넘기고 '제어권'을 바로 반환하여 사용자가 다른 작업을 수행할 수 있음(Non Blocking)
+> * 브라우저는 주기적으로 파일 다운로드 작업 진행상황을 확인하여 다운로드 진행바로 표시 및 다운로드 완료시 지정된 경로에 파일 형태로 저장작업 수행 (Sync)
+
+![image](https://github.com/JisooOh94/study/assets/48702893/f6332ddf-e267-4580-ad8a-c12984d47e77)
+
 ### Async - Blocking
 * 호출함수가 피호출함수의 작업완료를 대기
 * 호출함수는 피호출함수의 작업완료를 신경쓰지 않고, 피호출함수가 작업완료시 직접 후처리 로직(callback메서드) 수행
@@ -68,3 +74,6 @@
 ![image](https://user-images.githubusercontent.com/48702893/109412882-e7513100-79ed-11eb-8d43-d18b2786486d.png)
 
 > [이미지출처](http://homoefficio.github.io/2017/02/19/Blocking-NonBlocking-Synchronous-Asynchronous/)
+
+> Ref
+> * https://inpa.tistory.com/entry/%F0%9F%91%A9%E2%80%8D%F0%9F%92%BB-%EB%8F%99%EA%B8%B0%EB%B9%84%EB%8F%99%EA%B8%B0-%EB%B8%94%EB%A1%9C%ED%82%B9%EB%85%BC%EB%B8%94%EB%A1%9C%ED%82%B9-%EA%B0%9C%EB%85%90-%EC%A0%95%EB%A6%AC
