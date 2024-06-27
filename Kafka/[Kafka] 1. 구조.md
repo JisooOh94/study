@@ -66,7 +66,7 @@
 * <img width="752" alt="image" src="https://github.com/JisooOh94/study/assets/48702893/978150ce-857a-4f0a-ac56-849cde1d9f6c">
 * 파티션에 저장되는 각 메시지는 offset 이라는 1씩 증가하는 index 값을 가지게 되며, 이 offset 으로 파티션 내 메시지 식별 가능
 * producer 가 메시지 전송시, 메시지는 해당 토픽의 파티션들에 round-robin 방식으로 골고루 저장되게 되며, 이를 통해 broker 에도 부하가 골고루 분산되게됨
-* 하나의 파티션 내의 메시지간에는 LIFO 를 보장하나, 여러 파티션간 메시지는 LIFO 를 보장하지 않음
+* 하나의 파티션 내의 메시지간에는 FIFO 를 보장하나, 여러 파티션간 메시지는 FIFO 를 보장하지 않음
     * 메시지가 프로듀스 된 시간 순서에따라 처리가 되어야한다면, 토픽의 메시지를 하나의 파티션에만 프로듀싱하도록 파티션 고정 가능
 * 토픽의 파티션 추가는 런타임시점에도 자유롭게 가능하나, 파티션 제외는 불가능(토픽 삭제 후 재생성으로만 가능)
 
@@ -79,7 +79,7 @@
         * 하나의 메시지 데이터를 여러 용도로 사용하고자 하는 요구사항 충족
         * 각 consumer group이 개별적으로 파티션의 offset 을 관리함으로서 가능
 * 토픽내의 파티션과 consumer group 내 consumer 는 1:1, N:1 의 관계는 가능하나, 1:N 의 관계는 불가능
-    * 하나의 파티션을 여러개의 consumer 가 소비해가는경우, LIFO 이 깨질수 있고 last offset 관리가 어려워짐
+    * 하나의 파티션을 여러개의 consumer 가 소비해가는경우, FIFO 이 깨질수 있고 last offset 관리가 어려워짐
     * partition 수보다 consumer 수가 더 많을경우, 아무런 partition 도 할당받지 못한 잉여 consumer 가 발생하므로, topic 의 partition 수에 따라 consumer group 내 consumer 수 조절이 중요
 * consumer group 이 구독하고있는 topic 의 브로커중 하나가 Consumer Group Coordinator 로 선정되어 Consumer group 내 consumer 관리 수행
     * 각 consumer 는 CGC 로 hbm 전송, CGC 는 timeout 시간(session.timeout.ms) 내에 hbm 을 전송하지 않은 consumer 를 비정상 상태로 간주하고 Consumer group 에서 제외, 리밸런싱 수행
