@@ -11,8 +11,8 @@
 	* 수행할 행위
 	* Get(read), Post(create), Put/Patch(update), Delete(delete)
 * 표현(representation)
-	* 자원(자원 상태)에 대한 표현
-	* JSON, XML 등의 여러가지 자원 상태 표현 방식 존재
+	* 클라이언트가 요청한 자원을 서버가 응답할때, 어떤 표현방식으로 응답할지
+	* JSON, XML 등의 여러가지 자원 상태 표현 방식 존재하며, Content-Type 헤더 등을 통해 서버가 자원을 표현한 방식을 클라이언트에게 알려줌
 
 ### Rest API 특징
 * Uniform (균일한 인터페이스)
