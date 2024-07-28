@@ -1,0 +1,7 @@
+FROM node:14
+
+COPY ../test_4.3 /
+
+RUN npm install
+
+CMD ["npm", "start"]
