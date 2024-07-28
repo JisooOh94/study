@@ -7,7 +7,7 @@ COPY src ./src
 
 RUN mvn clean package
 
-FROM openjdk:11-sre-slim
+FROM openjdk:11-jre-slim
 WORKDIR /app
 
 # build 라는 이름의 이미지를 실행한 컨테이너로부터 /app/target/*.jar 를 복사해옴
