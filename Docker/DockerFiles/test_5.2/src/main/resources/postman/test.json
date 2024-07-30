@@ -1,0 +1,389 @@
+{
+  "info": {
+    "_postman_id": "a0a2c8b2-2967-483c-bf9a-bc1568e1e68a",
+    "name": "Leafy API Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get all plants",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/plants",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plants"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plants retrieved successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Get plant by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/plants/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plants",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant retrieved successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Add plant",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Test Plant\",\n    \"description\": \"This is a test plant\",\n    \"image\": \"https://example.com/plant.jpg\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/plants",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plants"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant added successfully",
+          "status": "201",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Update plant",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"Updated Test Plant\",\n    \"description\": \"This is an updated test plant\",\n    \"image\": \"https://example.com/plant-updated.jpg\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/plants/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plants",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant updated successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Delete plant",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/plants/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plants",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant deleted successfully",
+          "status": "204",
+          "code": 204,
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Get all plant logs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/plant-logs",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plant-logs"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant logs retrieved successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Get plant log by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/plant-logs/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plant-logs",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant log retrieved successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Add plant log",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userPlantId\": 1,\n    \"date\": \"2022-03-28T18:23:54.000Z\",\n    \"watered\": true,\n    \"fertilized\": false,\n    \"pruned\": false\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/plant-logs",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plant-logs"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant log added successfully",
+          "status": "201",
+          "code": 201,
+          "_postman_previewlanguage":
+          "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Update plant log",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userPlantId\": 1,\n    \"date\": \"2022-03-28T18:23:54.000Z\",\n    \"watered\": true,\n    \"fertilized\": true,\n    \"pruned\": true\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/plant-logs/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plant-logs",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant log updated successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Delete plant log",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/plant-logs/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "plant-logs",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Plant log deleted successfully",
+          "status": "204",
+          "code": 204,
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Get all user plants",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/user-plants?userId=1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "user-plants"
+          ],
+          "query": [
+            {
+              "key": "userId",
+              "value": "1"
+            }
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "User plants retrieved successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    },
+    {
+      "name": "Get user plant by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {},
+        "url": {
+          "raw": "{{base_url}}/api/v1/user-plants/1",
+          "protocol": "{{base_url}}",
+          "host": [
+            "api",
+            "v1",
+            "user-plants",
+            "1"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "User plant retrieved successfully",
+          "status": "200",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "body": "",
+          "cookie": []
+        }
+      ]
+    }
+  ]
+}
