@@ -37,15 +37,15 @@
 #### Controller broker
 * 브로커 관리 
   * 컨트롤러는 클러스터 내의 모든 브로커의 상태를 추적합니다. 브로커가 클러스터에 추가되거나 제거될 때, 컨트롤러는 이러한 변화를 감지 및 처리
-* 리더 파티션 선출 
+* 리더 파티션 할당 및 재할당
   * 토픽 생성시, 설정된 파티션 개수만큼 각 브로커에 리더 파티션 할당
   * 리더 파티션이 있는 브로커에 장애 발생시, 팔로워 파티션 중 하나를 리더 파티션으로 승격
 * 리플리카 할당 및 재할당
-   * 토픽이 생성시, 각 파티션의 리플리카를 어떤 브로커에 할당할지 결정
-   * 또한, 브로커 장애와 같은 상황에서는 리플리카의 재할당 수행 
+   * 토픽 생성시, 각 파티션의 리플리카를 어떤 브로커에 할당할지 결정
+   * 또한, 브로커 장애와 같은 상황에서는 리플리카의 재할당 수행
 * 장애 복구
   * Kafka cluster 내 브로커들의 h/c 수행.
-  * 브로커 장애 발생 시, 장애 발생한 브로커의 파티션과 리플리카를 다른 브로커로 이동
+  * 브로커 장애 발생 시, 장애 발생한 브로커의 리더 파티션과 리플리카를 다른 브로커에 재할당
 
 > cf) Controller broker 의 h/c 는 zookeeper 가 수행. h/c 실패시 zookeeper 에서 controller broker 재선출
 
@@ -54,9 +54,8 @@
 * (Kafka client 를 통해)topic 생성요청시, 컨트롤러 브로커에서 topic 생성 처리 수행
   1. 생성 요청된 topic 의 메타데이터(파티션수, 리플리케이션 팩터 등) 검증
   2. Kafka Cluster 내 각 브로커들에게 파티션 및 리플리카 할당
-  3. 토픽 리더 브로커 선출
-  4. zookeeper 에 토픽 메타데이터(파티션 정보, 리플리카 할당 정보 등) 저장
-  5. 클러스터 전체 브로커에 변경 사항 전파
+  3. zookeeper 에 토픽 메타데이터(파티션 정보, 리플리카 할당 정보 등) 저장
+  4. 클러스터 전체 브로커에 변경 사항 전파
 
 #### partition
 * 메시지가 저장되는 메시지 큐
@@ -82,8 +81,11 @@
     * 하나의 파티션을 여러개의 consumer 가 소비해가는경우, FIFO 이 깨질수 있고 last offset 관리가 어려워짐
     * partition 수보다 consumer 수가 더 많을경우, 아무런 partition 도 할당받지 못한 잉여 consumer 가 발생하므로, topic 의 partition 수에 따라 consumer group 내 consumer 수 조절이 중요
 * consumer group 이 구독하고있는 topic 의 브로커중 하나가 Consumer Group Coordinator 로 선정되어 Consumer group 내 consumer 관리 수행
+  * Consumer Group 내 Consumer H/C 수행
     * 각 consumer 는 CGC 로 hbm 전송, CGC 는 timeout 시간(session.timeout.ms) 내에 hbm 을 전송하지 않은 consumer 를 비정상 상태로 간주하고 Consumer group 에서 제외, 리밸런싱 수행
-    * 리더 컨슈머(가장 첫번째로 Join Group 요청을 전송한 컨슈머) 선정 및 리더 컨슈머에게 파티션 분배 위임 (리더 컨슈머가 분배한 파티션 정보대로 각 컨슈머에게 할당된 파티션 정보 전달)
+  * 리더 컨슈머 선정 및 리더 컨슈머에게 파티션 분배 위임
+    * 리더 컨슈머 : 가장 첫번째로 Join Group 요청을 전송한 컨슈머
+    * CGC 는 리더 컨슈머가 분배한 파티션 정보대로 각 컨슈머에게 할당된 파티션 정보 전달
 * consumer group 이 처리할 topic 설정시, topic 의 파티션들을 consumer group 내 consumer 들에게 할당하는 리밸런싱 과정 수행됨
     * consumer group 에 consumer 가 추가되거나 삭제될시, 리밸런싱 재수행
 * consumer group 의 각 consumer 는 파티션에서 마지막으로 컨슈밍한 offset 정보를 저장 및 관리
@@ -99,7 +101,7 @@
 ### 4. zookeeper
 * 연결되어있는 kafka 클러스터의 식별정보, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보 저장 관리
 * 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
-* zookeeper 도 가용성을 위해 여러대의 zookeepr 서버를 묶은 클러스터로 구성이 가능
+* zookeeper 도 가용성을 위해 여러대의 zookeepr 서버를 묶은 클러스터로 구성이 가능(주키퍼 앙상블)
   * 하나의 leader zookeeper - 나머지 follower zookeeper 로 구성
   * 변경사항이 leader zookeeper 에 먼저 반영되면 나머지 follower zookeeper 들이 동기하는 방식으로 동작 
 * 하나의 zookeeper 서버로 여러개의 kafka cluster 관리 가능
