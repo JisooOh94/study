@@ -16,7 +16,7 @@
 * group.id
   * 컨슈머가 속하는 컨슈머 그룹 id
 * session.timeout.ms
-  * 컨슈머와 컨슈머 그룹 사이의 세션 타임 아웃 시간
+  * 컨슈머와 Consumer Group Coordinator 사이의 세션 타임 아웃 시간(컨슈머가 CGC 에게 본 설정값을 전송, CGC 는 이 값으로 컨슈머와의 session timeout 판단)
   * 컨슈머는 heartbeat.interval.ms 시간 간격으로 Consumer Group Coordinator에게 hbm 전송
   * 컨슈머가 session.timeout.ms 시간 내에 hbm 을 Consumer Group Coordinator으로 날리지 않으면, Consumer Group Coordinator는 해당 컨슈머에 장애가 발생한것으로 인지하고 리밸런싱 수행
   * 값이 작을수록 더 빠르게 컨슈머의 장애를 감지할 수 있다는 장점이 있으나, 실제 장애가 아닌, 일시적인 지연까지 장애로 감지하여 빈번한 리밸런싱([빈번한 리밸런싱이 좋지 않은 이유]())을 유발하는 단점 존재
