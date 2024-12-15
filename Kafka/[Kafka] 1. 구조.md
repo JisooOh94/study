@@ -10,7 +10,7 @@
 	* publisher 는 subscriber 에 대한 정보 없이 메시지만 발행하고, subscriber 도 publisher에 대한 정보 없이 메시지 소비 가능
 	* 발행자와 구독자의 디커플링을 통해 가용성 및 확장성 증대
 	
-### 1. producer
+## 1. producer
 * 크게 Accumulator, Sender로 구성
 * Accumulator
 	* 전송 요청되는 메시지들을 모아두는 버퍼, 저장공간
@@ -28,13 +28,13 @@
 
 ![image](https://user-images.githubusercontent.com/48702893/153410414-f6ceec63-e151-4da7-b8ce-9bda37657bf0.png)
 
-### 2. broker
+## 2. broker
 * 카프카 서버로서 확장성 및 고가용성을 위해 여러개의 broker(최소 3개 이상 권장) 를 묶은 Kafka cluster 로 구성됨
 * Producer 로부터 수신한 메세지 저장 및 관리 수행
 * Producer 에서 메시지 전송시, round-robin 방식으로 Kafka cluster 내 broker 들에게 공평하게 할당
 * zookeeper 가 Kafka cluster 의 브로커들중 하나를 컨트롤러 브로커로 선정하여 클러스터 내 브로커 관리 수행 위임
 
-#### Controller broker
+### Controller broker
 * 브로커 관리 
   * 컨트롤러는 클러스터 내의 모든 브로커의 상태를 추적합니다. 브로커가 클러스터에 추가되거나 제거될 때, 컨트롤러는 이러한 변화를 감지 및 처리
 * 리더 파티션 할당 및 재할당
@@ -49,7 +49,7 @@
 
 > cf) Controller broker 의 h/c 는 zookeeper 가 수행. h/c 실패시 zookeeper 에서 controller broker 재선출
 
-#### Topic
+### Topic
 * 메시지 구분을 위한 타이틀 개념
 * (Kafka client 를 통해)topic 생성요청시, 컨트롤러 브로커에서 topic 생성 처리 수행
   1. 생성 요청된 topic 의 메타데이터(파티션수, 리플리케이션 팩터 등) 검증
@@ -57,7 +57,7 @@
   3. zookeeper 에 토픽 메타데이터(파티션 정보, 리플리카 할당 정보 등) 저장
   4. 클러스터 전체 브로커에 변경 사항 전파
 
-#### partition
+### partition
 * 메시지가 저장되는 메시지 큐
 * 하나의 토픽당 여러개의 파티션이 생성될 수 있으며, 각 파티션은 kafka cluster 내의 브로커들에게 골고루 나뉘어 저장 및 관리됨
     * zookeeper 에서 설정한 컨트롤러 브로커가 파티션 분배 작업 수행
@@ -71,7 +71,7 @@
 
 ![image](https://user-images.githubusercontent.com/48702893/149141998-24c29f47-c66d-4534-810c-3aae65f65cae.png)
 
-### 3. consumer
+## 3. consumer
 * 파티션에 저장되어있는 메시지를 소비해가 처리를 수행하는 주체
 * consumer 또한 마찬가지로 여러개의 consumer 를 묶은 consumer group 으로 관리되며, 토픽은 consumer group 단위로 구독됨
     * 하나의 토픽을 여러개의 consumer group 이 구독 가능
@@ -96,9 +96,68 @@
         * 작을경우 : 메시지 중복으로 처리 됨
         * 클경우 : 처리된 offset과 commit 된 offset 사이의 모든 메시지 누락      
 	
-![image](https://user-images.githubusercontent.com/48702893/149145169-80291447-9b7e-45e0-a62a-b46fdd111892.png)	
+![image](https://user-images.githubusercontent.com/48702893/149145169-80291447-9b7e-45e0-a62a-b46fdd111892.png)
 
-### 4. zookeeper
+### 파티션 할당 전략
+* 컨슈머 그룹 내의 각 컨슈머에게 파티션을 어떻게 배정할지를 결정하는 방법
+* 컨슈머의 `partition.assignment.strategy` 설정값을 통해 설정 가능
+
+```java
+props.put("partition.assignment.strategy", "org.apache.kafka.clients.consumer.RoundRobinAssignor");
+```
+
+#### RangeAssignor
+* default 전략
+* 파티션을 정렬한 후, 각 컨슈머에게 연속적인 범위의 파티션을 할당
+  * e.g. 3개의 컨슈머와 9개의 파티션이 있는 경우, 첫 번째 컨슈머는 첫 3개의 파티션을, 두 번째 컨슈머는 다음 3개의 파티션을, 세 번째 컨슈머는 마지막 3개의 파티션을 할당
+* 장점
+  * 각 컨슈머가 연속적인 파티션을 처리하므로 특정 파티션에 대한 데이터 로컬리티를 유지하여 효율적으로 처리
+* 단점
+  * 파티션 수와 컨슈머 수가 맞지 않으면 일부 컨슈머에 파티션이 불균등하게 할당
+* 사용 사례
+  * 파티션 수가 컨슈머 수의 배수인 경우
+  * 데이터 로컬리티가 중요한 경우
+
+> RangeAssignor 의 데이터 로컬리티
+> * 한 금융 애플리케이션이 주식 거래 데이터를 Kafka를 통해 처리한다고 가정. 이 애플리케이션은 여러 주식의 거래 데이터를 다양한 파티션으로 나누어 저장 
+> * 파티션 설정: 각 주식은 고유한 파티션에 할당. 예를 들어, AAPL, MSFT, GOOGL 등의 주식은 각각의 파티션에 저장 
+> * RangeAssignor 사용: 컨슈머 그룹 내의 각 컨슈머는 특정 주식의 파티션을 연속적으로 할당. 예를 들어, 컨슈머 1은 AAPL과 MSFT의 파티션을, 컨슈머 2는 GOOGL과 AMZN의 파티션을 할당 
+> * 데이터 로컬리티 유지: 특정 컨슈머가 특정 주식의 데이터를 지속적으로 처리하므로, 해당 컨슈머의 캐시나 로컬 스토리지에 해당 데이터가 효율적으로 유지. 이는 데이터 처리 속도를 높이고 네트워크 대역폭을 절약
+
+#### RoundRobinAssignor
+* 파티션을 라운드 로빈 방식으로 컨슈머에게 할당
+* 모든 컨슈머가 동일한 수의 파티션을 가지도록 하여 부하를 균등하게 분산(단, 파티션의 개수가 컨슈머 개수의 배수가 아닌경우 균등 분산 불가능)
+* 장점
+  * 파티션이 컨슈머에 균등하게 분배
+* 단점
+  * 데이터 로컬리티가 중요할 때는 비효율적
+* 사용 사례
+  * 부하 균등 분산이 중요한 경우
+
+#### StickyAssignor
+* 리밸런싱시, 파티션 이동을 최소화하는 할당 방식
+* 가능한 한 기존의 파티션 할당 상태를 유지하면서 리밸런싱 수행
+* 장점
+  * 파티션 이동을 최소화하여 데이터 로컬리티 유지 및 오프세 정보 상태 저장 비용 절약
+* 단점
+  * 초기 파티션 할당이 비효율적일 경우, 비효율성이 계속 유지
+  * 복잡한 리밸런싱 로직으로 인해 일부 상황에서 설정이 복잡함
+* 사용 사례
+  * 리밸런싱이 빈번하게 수행되는경우
+  * 파티션의 이동을 최소화하여 안정성을 유지하고자 할때
+
+#### CooperativeStickyAssignor
+* StickyAssignor의 확장 버전으로, 리밸런싱 과정에서 최소한의 파티션 이동을 보장하면서 STW를 최소화
+* 클라이언트가 협력적으로 리밸런스를 수행하여 보다 부드러운 전환을 제공
+* 장점:
+  * StickyAssignor의 장점을 유지하면서 리밸런싱 중단을 최소화 
+* 단점:
+  * 복잡한 리밸런싱 로직으로 인해 설정이 복잡
+* 사용 사례:
+  * 컨슈머 그룹의 안정성을 중요시하는 환경
+
+
+## 4. zookeeper
 * 연결되어있는 kafka 클러스터의 식별정보, 각 브로커 메타정보(권한, 컨트롤러 브로커 여부 등), Topic 및 partition offset 정보 저장 관리
 * 브로커는 zookeeper 를 통해 메세지 저장 및 관리 작업을 위해 필요한 공유정보 조회
 * zookeeper 도 가용성을 위해 여러대의 zookeepr 서버를 묶은 클러스터로 구성이 가능(주키퍼 앙상블)
