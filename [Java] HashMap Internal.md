@@ -1,4 +1,9 @@
 # HashMap Internal
+### Collision handling
+* `put` 수행할때 Collistion 발생시, `equals()` 메서드를 통해 실제 값 비교하여 bucket 내에 이미 존재하는 entry 인지 확인
+* `get` 수행할때도 마찬가지로, `hashcode()` 로 bucket 을 찾은후, bucket 내에서 조회할때는 `equals()` 메서드로 실제 값 비교하여 조히
+* 따라서 `hashcode()` override 시 `equals()` 까지 함께 override 필요
+
 ### Seperate Chaining
 * Seperate Chaining 을 이용하여 Collision control
 * 데이터 개수가 적을경우 Open Addressing의 성능이 더 좋으나(연속된 공간에 데이터를 저장하기 때문에), 일정 개수 이상 많아지면 Seperate Chaining이 더 효율적
