@@ -24,6 +24,8 @@
 * 디스크의 가용성 및 안정성은 다소 떨어짐
   * RAID 를 구성하는 디스크중 하나라도 문제가 발생 할 경우, 전체 RAID의 데이터 유실
 
+![image](https://github.com/user-attachments/assets/56f182eb-8b38-4ee8-a62c-5184a057c3f0)
+
 ### RAID 1
 * RAID 를 구성하는 모든 디스크에 동일한 데이터를 복제 저장(Mirroring)
 * 디스크의 가용성 및 안정성을 최대화 하는 방식
@@ -33,6 +35,8 @@
   * 데이터 쓰기 뿐만 아니라 복제도 해야하므로 쓰기 성능이 떨어짐
   * 데이터 읽기는 RAID 를 구성하는 전체 디스크에서 분산 처리되므로 성능 좋음
   * 단일 디스크와 동일한 디스크 용량이므로 용량 효율 떨어짐
+
+![image](https://github.com/user-attachments/assets/4232fc7c-326f-4abd-90d0-a3163bf6a36f)
 
 ### RAID 2
 * 여러개의 디스크에 데이터 분산 저장
@@ -69,6 +73,8 @@
   * 디스크를 2개씩 묶어서 RAID 1으로 구성, 이들을 다시 RAID 0으로 묶어서 구성
   * 즉, 데이터를 미러링하면서도 스트라이핑을 동시에 수행하는 구조
 * 높은 데이터 안정성과 빠른 속도를 제공
+
+![image](https://github.com/user-attachments/assets/f08ea2fe-59f7-4095-b385-6a151ca99501)
 
 > Reference
 > * https://blog.naver.com/hostinggodo/220641452948
