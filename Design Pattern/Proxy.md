@@ -57,3 +57,8 @@ public static void main(String[] args) {
     image.display();  // 실제 이미지 로딩은 display() 호출 시에만 발생
 }
 ```
+
+### Decorator 패턴과의 차이점
+* 데코레이터 패턴과 프록시 패턴의 주요 차이점은 목적에 있음
+  * 데코레이터 패턴: 객체에 새로운 기능을 동적으로 추가 
+  * 프록시 패턴 : 객체에 대한 접근 제어
