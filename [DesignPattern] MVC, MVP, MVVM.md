@@ -1,17 +1,18 @@
 # 1. MVC (Model-View-Controller)
 
-### 구조
-- **Model**:
-    - 데이터와 그 데이터를 처리하는 비즈니스 로직을 포함.
-    - 데이터베이스와의 직접적인 상호작용 담당.
+### 구성 요소
+- **Model**: 데이터와 비즈니스 로직 관리.
+- **View**: 사용자 인터페이스 담당.
+- **Controller**: 사용자 입력 처리, Model과 View 업데이트.
 
-- **View**:
-    - 사용자에게 데이터를 표시하는 부분.
-    - 사용자 인터페이스를 구성하며, 사용자의 입력을 받음.
+### 작동 방식
+- 사용자 입력이 View에서 Controller로 전달됨.
+- Controller가 입력 처리, Model 업데이트, View 변경.
+- View가 Model로부터 데이터 받아 표시.
 
-- **Controller**:
-    - 사용자의 요청을 수신하고, 해당 요청을 처리할 모델과 뷰를 결정.
-    - 모델로부터 데이터를 가져와 뷰에 전달하거나, 뷰로부터 입력을 받고 모델을 업데이트.
+### 데이터 흐름
+- Controller가 입력 받아 Model과 View 업데이트.
+- View가 Model의 변경 사항 감시하거나 Controller 통해 업데이트.
 
 ### 장점
 - 명확한 역할 분리로 인해 코드의 유지보수와 테스트가 용이.
@@ -80,21 +81,18 @@ public class UserController {
 
 # 2. MVP (Model-View-Presenter)
 
-### 구조
-- **Model**:
-    - MVC의 모델과 유사하게 데이터와 비즈니스 로직 포함.
-    - 데이터베이스와의 상호작용 담당.
-    - Presenter에 데이터를 제공하고, 요청에 따라 데이터를 갱신.
+### 구성 요소
+- **Model**: 데이터와 비즈니스 로직 포함.
+- **View**: 사용자 인터페이스, UI 로직 없음.
+- **Presenter**: View와 Model 중재자, 모든 UI 로직 처리.
 
-- **View**:
-    - 사용자 인터페이스를 담당하며, Presenter와 상호작용.
-    - 사용자 입력을 받아 Presenter에 전달.
+### 작동 방식
+- 사용자 입력이 View에서 Presenter로 전달됨.
+- Presenter가 입력 처리, Model 업데이트, View에 결과 표시.
 
-- **Presenter**:
-    - 뷰와 모델 간의 중재자 역할.
-    - 뷰의 상태를 업데이트하고, 사용자 입력을 처리.
-    - 모든 UI 로직을 처리하고, 뷰를 업데이트.
-    - 모델에서 데이터를 가져와 뷰에 적용.
+### 데이터 흐름
+- View는 Presenter와만 상호작용.
+- Presenter가 Model 데이터 가져와 View에 전달.
 
 ### 장점
 - 뷰와 모델 사이의 낮은 결합도.
@@ -155,20 +153,19 @@ public interface UserView {
 
 # 3. MVVM (Model-View-ViewModel)
 
-### 구조
-- **Model**:
-    - 데이터와 비즈니스 로직 포함.
-    - 데이터베이스와의 상호작용 담당.
+### 구성 요소
+- **Model**: 데이터와 비즈니스 로직.
+- **View**: 사용자 인터페이스.
+- **ViewModel**: View의 상태와 행동 관리, 데이터 바인딩으로 View와 상호작용.
 
-- **View**:
-    - 사용자 인터페이스 담당.
-    - ViewModel과 데이터 바인딩을 통해 상호작용.
-    - 사용자 입력을 받아 ViewModel에 전달.
+### 작동 방식
+- View와 ViewModel 간 양방향 데이터 바인딩.
+- 사용자 입력이 ViewModel로 전달, Model 업데이트.
+- Model 데이터 변경 시 ViewModel 통해 View에 자동 반영.
 
-- **ViewModel**:
-    - 뷰의 상태와 행동을 관리.
-    - 모델에서 데이터를 가져와 뷰에 바인딩.
-    - 데이터 바인딩을 통해 뷰와 상호작용하며, UI 로직 처리.
+### 데이터 흐름
+- View와 ViewModel 간 데이터 바인딩으로 상호작용.
+- ViewModel이 Model 업데이트, View 자동 반영.
 
 ### 장점
 - 데이터 바인딩을 통해 UI 업데이트가 간편.
@@ -248,3 +245,18 @@ public class UserView {
 | MVC   | 명확한 역할 분리, 재사용성 및 확장성 증대                   | 컨트롤러 비대화, 모델과 뷰 의존성                          |
 | MVP   | 낮은 결합도, 테스트 용이성 증가                             | Presenter 비대화, 복잡한 UI 로직 관리 어려움                |
 | MVVM  | 간편한 UI 업데이트, 낮은 결합도                             | 데이터 바인딩 디버깅 어려움, ViewModel 비대화               |
+
+### View와 Model의 상호작용
+- **MVC**: View가 Model과 직접 상호작용 가능.
+- **MVP**: View는 Model과 직접 상호작용 안 함. Presenter가 중재.
+- **MVVM**: View와 ViewModel 간 데이터 바인딩으로 상호작용.
+
+### 비즈니스 로직의 위치
+- **MVC**: Model과 Controller에 분산.
+- **MVP**: Presenter에 집중.
+- **MVVM**: ViewModel에 집중.
+
+### 적용 분야
+- **MVC**: 웹 애플리케이션.
+- **MVP**: 데스크톱 및 모바일 애플리케이션.
+- **MVVM**: 데이터 바인딩 용이한 프레임워크.
